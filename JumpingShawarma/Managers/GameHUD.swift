@@ -1,6 +1,14 @@
 import SpriteKit
 
+enum LevelCompleteAction {
+    case next
+    case playAgain
+}
+
 final class GameHUD {
+    static let nextButtonName = "levelCompleteNext"
+    static let playAgainButtonName = "levelCompletePlayAgain"
+
     let scoreLabel: SKLabelNode
     let scoreCaptionLabel: SKLabelNode
     let messageLabel: SKLabelNode
@@ -13,6 +21,11 @@ final class GameHUD {
     private let completeTitleLabel: SKLabelNode
     private let completeMessageLabel: SKLabelNode
     private let completeSubLabel: SKLabelNode
+    private let completeNextButton: SKNode
+    private let completePlayAgainButton: SKNode
+
+    private var isNextLevelEnabled = false
+    private var panelCenter = CGPoint.zero
 
     init(sceneSize: CGSize) {
         scoreBadge = SKShapeNode(rectOf: GameHUDLayout.scoreBadgeSize, cornerRadius: 14)
@@ -50,7 +63,7 @@ final class GameHUD {
         completeOverlay.zPosition = 30
         completeOverlay.isHidden = true
 
-        completePanel = SKShapeNode(rectOf: CGSize(width: 300, height: 250), cornerRadius: 22)
+        completePanel = SKShapeNode(rectOf: CGSize(width: 300, height: 280), cornerRadius: 22)
         completePanel.fillColor = GameTheme.color(0.12, 0.08, 0.06, 0.94)
         completePanel.strokeColor = GameTheme.gold
         completePanel.lineWidth = 3
@@ -93,6 +106,19 @@ final class GameHUD {
         completeSubLabel.zPosition = 32
         completeSubLabel.isHidden = true
 
+        completePlayAgainButton = Self.makeButton(
+            title: "Play Again",
+            name: Self.playAgainButtonName,
+            enabled: true
+        )
+        completeNextButton = Self.makeButton(
+            title: "Next",
+            name: Self.nextButtonName,
+            enabled: true
+        )
+        completePlayAgainButton.isHidden = true
+        completeNextButton.isHidden = true
+
         GameTheme.attachShadow(to: scoreLabel)
         GameTheme.attachShadow(to: messageLabel)
         GameTheme.attachShadow(to: subMessageLabel)
@@ -115,6 +141,8 @@ final class GameHUD {
         scene.addChild(completeTitleLabel)
         scene.addChild(completeMessageLabel)
         scene.addChild(completeSubLabel)
+        scene.addChild(completePlayAgainButton)
+        scene.addChild(completeNextButton)
     }
 
     func layout(for sceneSize: CGSize, safeAreaTop: CGFloat = 0) {
@@ -135,12 +163,14 @@ final class GameHUD {
         messageLabel.position = CGPoint(x: sceneSize.width / 2, y: sceneSize.height * 0.62)
         subMessageLabel.position = CGPoint(x: sceneSize.width / 2, y: sceneSize.height * 0.52)
 
-        let center = CGPoint(x: sceneSize.width / 2, y: sceneSize.height * 0.5)
-        completePanel.position = center
-        completeIcon.position = CGPoint(x: center.x, y: center.y + 72)
-        completeTitleLabel.position = CGPoint(x: center.x, y: center.y + 18)
-        completeMessageLabel.position = CGPoint(x: center.x, y: center.y - 18)
-        completeSubLabel.position = CGPoint(x: center.x, y: center.y - 72)
+        panelCenter = CGPoint(x: sceneSize.width / 2, y: sceneSize.height * 0.5)
+        completePanel.position = panelCenter
+        completeIcon.position = CGPoint(x: panelCenter.x, y: panelCenter.y + 82)
+        completeTitleLabel.position = CGPoint(x: panelCenter.x, y: panelCenter.y + 28)
+        completeMessageLabel.position = CGPoint(x: panelCenter.x, y: panelCenter.y - 4)
+        completeSubLabel.position = CGPoint(x: panelCenter.x, y: panelCenter.y - 34)
+        completePlayAgainButton.position = CGPoint(x: panelCenter.x - 72, y: panelCenter.y - 88)
+        completeNextButton.position = CGPoint(x: panelCenter.x + 72, y: panelCenter.y - 88)
 
         completeOverlay.path = CGPath(
             rect: CGRect(
@@ -192,16 +222,21 @@ final class GameHUD {
         scoreBadge.alpha = 1.0
         updateScore(level.ordersRequired, goal: level.ordersRequired)
 
+        isNextLevelEnabled = level.next != nil
+        setButtonEnabled(completeNextButton, enabled: isNextLevelEnabled)
+
         completeOverlay.isHidden = false
         completePanel.isHidden = false
         completeIcon.isHidden = false
         completeTitleLabel.isHidden = false
         completeMessageLabel.isHidden = false
         completeSubLabel.isHidden = false
+        completePlayAgainButton.isHidden = false
+        completeNextButton.isHidden = false
 
         completeTitleLabel.text = "Level Complete!"
         completeMessageLabel.text = "\(level.name) cleared!"
-        completeSubLabel.text = "\(level.ordersRequired) orders served\nTap to return to levels"
+        completeSubLabel.text = "\(level.ordersRequired) orders served"
 
         GameTheme.syncShadow(on: completeTitleLabel)
         GameTheme.syncShadow(on: completeMessageLabel)
@@ -230,6 +265,20 @@ final class GameHUD {
         ]))
     }
 
+    func levelCompleteAction(at point: CGPoint) -> LevelCompleteAction? {
+        guard !completeOverlay.isHidden else { return nil }
+
+        if completePlayAgainButton.contains(point) {
+            return .playAgain
+        }
+
+        if completeNextButton.contains(point), isNextLevelEnabled {
+            return .next
+        }
+
+        return nil
+    }
+
     func updateScore(_ score: Int, goal: Int) {
         scoreLabel.text = "\(score) / \(goal)"
         GameTheme.syncShadow(on: scoreLabel)
@@ -242,9 +291,57 @@ final class GameHUD {
         completeTitleLabel.isHidden = true
         completeMessageLabel.isHidden = true
         completeSubLabel.isHidden = true
+        completePlayAgainButton.isHidden = true
+        completeNextButton.isHidden = true
         completePanel.removeAllActions()
         completeIcon.removeAllActions()
         completePanel.setScale(1.0)
         completeIcon.setScale(1.0)
+    }
+
+    private static func makeButton(title: String, name: String, enabled: Bool) -> SKNode {
+        let container = SKNode()
+        container.name = name
+        container.zPosition = 33
+
+        let background = SKShapeNode(rectOf: CGSize(width: 118, height: 42), cornerRadius: 12)
+        background.name = name
+        background.zPosition = 0
+        container.addChild(background)
+
+        let label = SKLabelNode(fontNamed: GameTheme.bodyFont)
+        label.text = title
+        label.fontSize = 16
+        label.verticalAlignmentMode = .center
+        label.horizontalAlignmentMode = .center
+        label.name = name
+        label.zPosition = 1
+        container.addChild(label)
+
+        setButtonEnabled(container, enabled: enabled)
+        return container
+    }
+
+    private static func setButtonEnabled(_ button: SKNode, enabled: Bool) {
+        guard let background = button.children.compactMap({ $0 as? SKShapeNode }).first,
+              let label = button.children.compactMap({ $0 as? SKLabelNode }).first else { return }
+
+        if enabled {
+            background.fillColor = GameTheme.gold.withAlphaComponent(0.22)
+            background.strokeColor = GameTheme.gold
+            background.lineWidth = 2
+            label.fontColor = GameTheme.gold
+            button.alpha = 1.0
+        } else {
+            background.fillColor = GameTheme.color(0.2, 0.18, 0.16, 0.5)
+            background.strokeColor = GameTheme.metalLight.withAlphaComponent(0.35)
+            background.lineWidth = 1.5
+            label.fontColor = GameTheme.cream.withAlphaComponent(0.35)
+            button.alpha = 0.65
+        }
+    }
+
+    private func setButtonEnabled(_ button: SKNode, enabled: Bool) {
+        Self.setButtonEnabled(button, enabled: enabled)
     }
 }

@@ -28,7 +28,7 @@ struct RootView: View {
             GameContainerView(
                 level: level,
                 onExit: { screen = .dashboard },
-                onLevelComplete: { screen = .dashboard }
+                onNextLevel: { screen = .game($0) }
             )
         }
     }
@@ -37,15 +37,15 @@ struct RootView: View {
 struct GameContainerView: View {
     let level: LevelConfig
     let onExit: () -> Void
-    let onLevelComplete: () -> Void
+    let onNextLevel: (LevelConfig) -> Void
 
     @State private var scene: GameScene
     @State private var showsLevelsButton = true
 
-    init(level: LevelConfig, onExit: @escaping () -> Void, onLevelComplete: @escaping () -> Void) {
+    init(level: LevelConfig, onExit: @escaping () -> Void, onNextLevel: @escaping (LevelConfig) -> Void) {
         self.level = level
         self.onExit = onExit
-        self.onLevelComplete = onLevelComplete
+        self.onNextLevel = onNextLevel
         _scene = State(initialValue: GameScene(size: CGSize(width: 393, height: 852), level: level))
     }
 
@@ -80,7 +80,7 @@ struct GameContainerView: View {
                 }
             }
             .onAppear {
-                scene.onLevelComplete = onLevelComplete
+                scene.onNextLevel = onNextLevel
                 scene.onStateChange = { state in
                     showsLevelsButton = state != .playing
                 }
