@@ -82,7 +82,9 @@ struct GameContainerView: View {
             .onAppear {
                 scene.onNextLevel = onNextLevel
                 scene.onStateChange = { state in
-                    showsLevelsButton = state != .playing
+                    showsLevelsButton = state == .ready
+                        || state == .gameOver
+                        || state == .levelComplete
                 }
                 showsLevelsButton = true
                 updateSceneLayout(proxy: proxy)

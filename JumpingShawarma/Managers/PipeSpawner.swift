@@ -2,9 +2,15 @@ import SpriteKit
 
 final class PipeSpawner {
     private var lastSpawnTime: TimeInterval = 0
+    private var canSpawn = true
 
     func resetTimer() {
         lastSpawnTime = 0
+        canSpawn = true
+    }
+
+    func disableSpawning() {
+        canSpawn = false
     }
 
     func stopPipes(in scene: SKScene) {
@@ -25,7 +31,24 @@ final class PipeSpawner {
         }
     }
 
+    func exitRemainingObstacles(in scene: SKScene) {
+        let names = [PipeNode.pipeName, PipeNode.scoreZoneName, PipeNode.scoredZoneName]
+        for name in names {
+            scene.enumerateChildNodes(withName: name) { node, _ in
+                node.removeAllActions()
+                node.run(.sequence([
+                    SKAction.group([
+                        SKAction.moveBy(x: -scene.size.width - 80, y: 0, duration: GameConstants.obstacleExitDuration),
+                        SKAction.fadeOut(withDuration: GameConstants.obstacleExitDuration),
+                    ]),
+                    SKAction.removeFromParent(),
+                ]))
+            }
+        }
+    }
+
     func update(currentTime: TimeInterval, scene: SKScene) {
+        guard canSpawn else { return }
         if lastSpawnTime == 0 {
             lastSpawnTime = currentTime
         }
