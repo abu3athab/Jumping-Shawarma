@@ -12,7 +12,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     private var hud: GameHUD!
     private var safeAreaTop: CGFloat = 0
 
-    var onLevelComplete: (() -> Void)?
+    var onNextLevel: ((LevelConfig) -> Void)?
     var onStateChange: ((GameState) -> Void)?
 
     init(size: CGSize, level: LevelConfig) {
@@ -150,7 +150,23 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         case .gameOver:
             enterReadyState()
         case .levelComplete:
-            onLevelComplete?()
+            handleLevelCompleteTap(touches)
+        }
+    }
+
+    private func handleLevelCompleteTap(_ touches: Set<UITouch>) {
+        guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
+
+        switch hud.levelCompleteAction(at: location) {
+        case .playAgain:
+            enterReadyState()
+        case .next:
+            if let nextLevel = level.next {
+                onNextLevel?(nextLevel)
+            }
+        case nil:
+            break
         }
     }
 
