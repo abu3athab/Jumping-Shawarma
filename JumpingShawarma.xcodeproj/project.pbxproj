@@ -1,0 +1,407 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000010000000000000001 /* JumpingShawarmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000001 /* JumpingShawarmaApp.swift */; };
+		A10000010000000000000002 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000002 /* GameScene.swift */; };
+		A10000010000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000003 /* Assets.xcassets */; };
+		A10000010000000000000004 /* GameConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000005 /* GameConstants.swift */; };
+		A10000010000000000000005 /* PhysicsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000006 /* PhysicsCategory.swift */; };
+		A10000010000000000000006 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000007 /* GameState.swift */; };
+		A10000010000000000000007 /* BirdNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000008 /* BirdNode.swift */; };
+		A10000010000000000000008 /* PipeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000009 /* PipeNode.swift */; };
+		A10000010000000000000009 /* ScoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000000A /* ScoreManager.swift */; };
+		A1000001000000000000000A /* GameHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000000B /* GameHUD.swift */; };
+		A1000001000000000000000B /* PipeSpawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000000C /* PipeSpawner.swift */; };
+		A1000001000000000000000C /* BackgroundBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000000D /* BackgroundBuilder.swift */; };
+		A1000001000000000000000D /* GroundBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000000E /* GroundBuilder.swift */; };
+		A1000001000000000000000E /* GameTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000000F /* GameTheme.swift */; };
+		A1000001000000000000000F /* LevelConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000010 /* LevelConfig.swift */; };
+		A10000010000000000000010 /* LevelProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000011 /* LevelProgress.swift */; };
+		A10000010000000000000011 /* LevelSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000012 /* LevelSelectView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A10000020000000000000001 /* JumpingShawarmaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JumpingShawarmaApp.swift; sourceTree = "<group>"; };
+		A10000020000000000000002 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		A10000020000000000000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000020000000000000004 /* JumpingShawarma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JumpingShawarma.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000020000000000000005 /* GameConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConstants.swift; sourceTree = "<group>"; };
+		A10000020000000000000006 /* PhysicsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsCategory.swift; sourceTree = "<group>"; };
+		A10000020000000000000007 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		A10000020000000000000008 /* BirdNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdNode.swift; sourceTree = "<group>"; };
+		A10000020000000000000009 /* PipeNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipeNode.swift; sourceTree = "<group>"; };
+		A1000002000000000000000A /* ScoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreManager.swift; sourceTree = "<group>"; };
+		A1000002000000000000000B /* GameHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameHUD.swift; sourceTree = "<group>"; };
+		A1000002000000000000000C /* PipeSpawner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipeSpawner.swift; sourceTree = "<group>"; };
+		A1000002000000000000000D /* BackgroundBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundBuilder.swift; sourceTree = "<group>"; };
+		A1000002000000000000000E /* GroundBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroundBuilder.swift; sourceTree = "<group>"; };
+		A1000002000000000000000F /* GameTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTheme.swift; sourceTree = "<group>"; };
+		A10000020000000000000010 /* LevelConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelConfig.swift; sourceTree = "<group>"; };
+		A10000020000000000000011 /* LevelProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelProgress.swift; sourceTree = "<group>"; };
+		A10000020000000000000012 /* LevelSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelSelectView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000030000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000040000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A10000040000000000000002 /* JumpingShawarma */,
+				A10000040000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000040000000000000002 /* JumpingShawarma */ = {
+			isa = PBXGroup;
+			children = (
+				A10000040000000000000004 /* App */,
+				A10000040000000000000005 /* Game */,
+				A10000040000000000000006 /* Core */,
+				A10000040000000000000007 /* Nodes */,
+				A10000040000000000000008 /* Managers */,
+				A10000040000000000000009 /* Environment */,
+				A10000020000000000000003 /* Assets.xcassets */,
+			);
+			path = JumpingShawarma;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000004 /* JumpingShawarma.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000004 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000001 /* JumpingShawarmaApp.swift */,
+				A10000020000000000000012 /* LevelSelectView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000005 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000002 /* GameScene.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000006 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000005 /* GameConstants.swift */,
+				A1000002000000000000000F /* GameTheme.swift */,
+				A10000020000000000000010 /* LevelConfig.swift */,
+				A10000020000000000000011 /* LevelProgress.swift */,
+				A10000020000000000000006 /* PhysicsCategory.swift */,
+				A10000020000000000000007 /* GameState.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000007 /* Nodes */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000008 /* BirdNode.swift */,
+				A10000020000000000000009 /* PipeNode.swift */,
+			);
+			path = Nodes;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000008 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				A1000002000000000000000A /* ScoreManager.swift */,
+				A1000002000000000000000B /* GameHUD.swift */,
+				A1000002000000000000000C /* PipeSpawner.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000009 /* Environment */ = {
+			isa = PBXGroup;
+			children = (
+				A1000002000000000000000D /* BackgroundBuilder.swift */,
+				A1000002000000000000000E /* GroundBuilder.swift */,
+			);
+			path = Environment;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000050000000000000001 /* JumpingShawarma */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000080000000000000003 /* Build configuration list for PBXNativeTarget "JumpingShawarma" */;
+			buildPhases = (
+				A10000060000000000000001 /* Sources */,
+				A10000030000000000000001 /* Frameworks */,
+				A10000070000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JumpingShawarma;
+			productName = JumpingShawarma;
+			productReference = A10000020000000000000004 /* JumpingShawarma.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000090000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					A10000050000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A10000080000000000000001 /* Build configuration list for PBXProject "JumpingShawarma" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A10000040000000000000001;
+			productRefGroup = A10000040000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000050000000000000001 /* JumpingShawarma */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000070000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000010000000000000003 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000060000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000010000000000000001 /* JumpingShawarmaApp.swift in Sources */,
+				A10000010000000000000011 /* LevelSelectView.swift in Sources */,
+				A10000010000000000000002 /* GameScene.swift in Sources */,
+				A10000010000000000000004 /* GameConstants.swift in Sources */,
+				A10000010000000000000005 /* PhysicsCategory.swift in Sources */,
+				A10000010000000000000006 /* GameState.swift in Sources */,
+				A10000010000000000000007 /* BirdNode.swift in Sources */,
+				A10000010000000000000008 /* PipeNode.swift in Sources */,
+				A10000010000000000000009 /* ScoreManager.swift in Sources */,
+				A1000001000000000000000A /* GameHUD.swift in Sources */,
+				A1000001000000000000000B /* PipeSpawner.swift in Sources */,
+				A1000001000000000000000C /* BackgroundBuilder.swift in Sources */,
+				A1000001000000000000000D /* GroundBuilder.swift in Sources */,
+				A1000001000000000000000E /* GameTheme.swift in Sources */,
+				A1000001000000000000000F /* LevelConfig.swift in Sources */,
+				A10000010000000000000010 /* LevelProgress.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A100000A0000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A100000A0000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A100000A0000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahmed.jumpingShawarma;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A100000A0000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahmed.jumpingShawarma;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000080000000000000001 /* Build configuration list for PBXProject "JumpingShawarma" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000A0000000000000001 /* Debug */,
+				A100000A0000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000080000000000000003 /* Build configuration list for PBXNativeTarget "JumpingShawarma" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000A0000000000000003 /* Debug */,
+				A100000A0000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A10000090000000000000001 /* Project object */;
+}
