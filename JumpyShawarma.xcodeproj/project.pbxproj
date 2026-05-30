@@ -28,6 +28,7 @@
 		A10000010000000000000013 /* RunSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000014 /* RunSnapshot.swift */; };
 		A10000010000000000000014 /* RewardedAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000015 /* RewardedAdManager.swift */; };
 		A10000010000000000000015 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000016 /* LaunchScreen.storyboard */; };
+		F2F064CC2FCAE20600402546 /* jumpSound.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2F064CD2FCAE20600402547 /* jumpSound.caf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		A10000020000000000000015 /* RewardedAdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardedAdManager.swift; sourceTree = "<group>"; };
 		A10000020000000000000016 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F2F064CB2FCAE20600402545 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F2F064CD2FCAE20600402547 /* jumpSound.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = jumpSound.caf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +87,7 @@
 				A10000040000000000000007 /* Nodes */,
 				A10000040000000000000008 /* Managers */,
 				A10000040000000000000009 /* Environment */,
+				F2F064D02FCAE2060040254A /* Resources */,
 				A10000020000000000000003 /* Assets.xcassets */,
 				A10000020000000000000016 /* LaunchScreen.storyboard */,
 			);
@@ -149,6 +152,14 @@
 				A10000020000000000000015 /* RewardedAdManager.swift */,
 			);
 			path = Managers;
+			sourceTree = "<group>";
+		};
+		F2F064D02FCAE2060040254A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F2F064CD2FCAE20600402547 /* jumpSound.caf */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		A10000040000000000000009 /* Environment */ = {
@@ -220,6 +231,7 @@
 			files = (
 				A10000010000000000000003 /* Assets.xcassets in Resources */,
 				A10000010000000000000015 /* LaunchScreen.storyboard in Resources */,
+				F2F064CC2FCAE20600402546 /* jumpSound.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

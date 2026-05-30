@@ -3,6 +3,11 @@ import SpriteKit
 enum BirdNode {
     private static let spriteName = "sprite"
     private static let playerSize = CGSize(width: 80, height: 58)
+    private static let jumpSound = SKAction.playSoundFileNamed("jumpSound.caf", waitForCompletion: false)
+    private static let flapScale = SKAction.sequence([
+        SKAction.scale(to: 1.08, duration: 0.06),
+        SKAction.scale(to: 1.0, duration: 0.08),
+    ])
 
     static func make(at position: CGPoint) -> SKNode {
         let container = SKNode()
@@ -24,14 +29,15 @@ enum BirdNode {
         return container
     }
 
+    static func preloadSounds() {
+        _ = jumpSound
+    }
+
     static func flap(_ bird: SKNode) {
         bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         bird.physicsBody?.applyImpulse(CGVector(dx: 0, dy: GameConstants.flapImpulse))
-
-        bird.run(.sequence([
-            .scale(to: 1.08, duration: 0.06),
-            .scale(to: 1.0, duration: 0.08),
-        ]))
+        bird.run(jumpSound)
+        bird.run(flapScale, withKey: "flapScale")
     }
 
     static func updateRotation(_ bird: SKNode) {
@@ -41,6 +47,7 @@ enum BirdNode {
     }
 
     static func resume(_ bird: SKNode, at position: CGPoint) {
+        bird.removeAction(forKey: "flapScale")
         bird.removeAllActions()
         bird.physicsBody?.velocity = .zero
         bird.position = position
@@ -55,6 +62,7 @@ enum BirdNode {
     static func reset(_ bird: SKNode, in sceneSize: CGSize) {
         bird.physicsBody?.isDynamic = false
         bird.physicsBody?.velocity = .zero
+        bird.removeAction(forKey: "flapScale")
         bird.removeAllActions()
         bird.position = CGPoint(
             x: sceneSize.width * GameConstants.birdStartXRatio,
