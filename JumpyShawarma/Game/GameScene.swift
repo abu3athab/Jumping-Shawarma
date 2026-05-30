@@ -17,6 +17,8 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     private var isInvincible = false
     private var lastUpdateTime: TimeInterval = 0
 
+    private static let gameOverSound = SKAction.playSoundFileNamed("gameOverSound.caf", waitForCompletion: false)
+
     var onNextLevel: ((LevelConfig) -> Void)?
     var onStateChange: ((GameState) -> Void)?
     var onWatchAdToContinue: ((@escaping (Bool) -> Void) -> Void)?
@@ -132,6 +134,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     /// Starts the scene's audio engine up front so the first flap plays the
     /// jump sound instantly instead of paying a cold-start freeze mid-tap.
     private func primeAudioEngine() {
+        _ = Self.gameOverSound
         guard !audioEngine.isRunning else { return }
         try? audioEngine.start()
     }
@@ -178,6 +181,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
         state = .gameOver
         onStateChange?(.gameOver)
+        run(Self.gameOverSound)
         BirdNode.stop(bird)
         pipeSpawner.stopPipes(in: self)
         scoreManager.saveBestIfNeeded()
