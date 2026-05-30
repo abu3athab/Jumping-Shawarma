@@ -1,20 +1,53 @@
 import SpriteKit
 
 enum BackgroundBuilder {
+    private static let stringLightsDrop: CGFloat = 72
+    private static let neonSignsDrop: CGFloat = 88
+
     static func add(to scene: SKScene, theme: ThemePalette) {
         scene.backgroundColor = theme.background
 
         switch theme.id {
         case .nightAlley:
             addStallSilhouettes(to: scene, theme: theme)
-            addStringLights(to: scene, theme: theme)
+            addTopDecorations(to: scene, drop: stringLightsDrop) {
+                addStringLights(to: $0, sceneWidth: scene.size.width, theme: theme)
+            }
         case .downtownRush:
             addCitySilhouettes(to: scene, theme: theme)
-            addNeonSigns(to: scene, theme: theme)
+            addTopDecorations(to: scene, drop: neonSignsDrop) {
+                addNeonSigns(to: $0, sceneWidth: scene.size.width, theme: theme)
+            }
         case .rooftopShift:
             addRooftopSilhouettes(to: scene, theme: theme)
             addSunsetGlow(to: scene, theme: theme)
         }
+    }
+
+    static func applySafeArea(top: CGFloat, in scene: SKScene, theme: ThemePalette) {
+        guard let decorations = scene.childNode(withName: "topDecorations") else { return }
+
+        let drop: CGFloat
+        switch theme.id {
+        case .downtownRush: drop = neonSignsDrop
+        case .nightAlley: drop = stringLightsDrop
+        default: return
+        }
+
+        decorations.position = CGPoint(x: 0, y: scene.size.height - top - drop)
+    }
+
+    private static func addTopDecorations(
+        to scene: SKScene,
+        drop: CGFloat,
+        build: (SKNode) -> Void
+    ) {
+        let root = SKNode()
+        root.name = "topDecorations"
+        root.zPosition = -15
+        root.position = CGPoint(x: 0, y: scene.size.height - drop)
+        scene.addChild(root)
+        build(root)
     }
 
     private static func addStallSilhouettes(to scene: SKScene, theme: ThemePalette) {
@@ -63,9 +96,8 @@ enum BackgroundBuilder {
         }
     }
 
-    private static func addStringLights(to scene: SKScene, theme: ThemePalette) {
-        let width = scene.size.width
-        let y = scene.size.height - 72
+    private static func addStringLights(to root: SKNode, sceneWidth width: CGFloat, theme: ThemePalette) {
+        let y: CGFloat = 0
         let bulbColors: [SKColor] = [
             theme.accent,
             theme.accentSecondary,
@@ -80,8 +112,8 @@ enum BackgroundBuilder {
         wire.path = wirePath
         wire.strokeColor = theme.wire
         wire.lineWidth = 2
-        wire.zPosition = -12
-        scene.addChild(wire)
+        wire.zPosition = 3
+        root.addChild(wire)
 
         let bulbCount = 7
         for index in 0..<bulbCount {
@@ -94,17 +126,17 @@ enum BackgroundBuilder {
             cord.fillColor = theme.metalMid
             cord.strokeColor = .clear
             cord.position = CGPoint(x: x, y: bulbY + 8)
-            cord.zPosition = -11
-            scene.addChild(cord)
+            cord.zPosition = 4
+            root.addChild(cord)
 
             let bulb = SKShapeNode(circleOfRadius: 5)
             bulb.fillColor = bulbColors[index % bulbColors.count]
             bulb.strokeColor = theme.textPrimary.withAlphaComponent(0.35)
             bulb.lineWidth = 1
             bulb.position = CGPoint(x: x, y: bulbY)
-            bulb.zPosition = -10
+            bulb.zPosition = 5
             GameTheme.pulse(node: bulb, minAlpha: 0.5, maxAlpha: 1.0, duration: 0.7 + Double(index) * 0.08)
-            scene.addChild(bulb)
+            root.addChild(bulb)
         }
     }
 
@@ -156,9 +188,8 @@ enum BackgroundBuilder {
         }
     }
 
-    private static func addNeonSigns(to scene: SKScene, theme: ThemePalette) {
-        let width = scene.size.width
-        let y = scene.size.height - 88
+    private static func addNeonSigns(to root: SKNode, sceneWidth width: CGFloat, theme: ThemePalette) {
+        let y: CGFloat = 0
 
         let signs: [(xRatio: CGFloat, width: CGFloat, color: SKColor)] = [
             (0.12, 70, theme.accent),
@@ -173,16 +204,16 @@ enum BackgroundBuilder {
             board.strokeColor = sign.color
             board.lineWidth = 2
             board.position = CGPoint(x: x, y: y)
-            board.zPosition = -10
+            board.zPosition = 5
             GameTheme.pulse(node: board, minAlpha: 0.45, maxAlpha: 1.0, duration: 0.9)
-            scene.addChild(board)
+            root.addChild(board)
 
             let glow = SKShapeNode(rectOf: CGSize(width: sign.width + 8, height: 16), cornerRadius: 8)
             glow.fillColor = sign.color.withAlphaComponent(0.08)
             glow.strokeColor = .clear
             glow.position = CGPoint(x: x, y: y)
-            glow.zPosition = -11
-            scene.addChild(glow)
+            glow.zPosition = 4
+            root.addChild(glow)
         }
     }
 

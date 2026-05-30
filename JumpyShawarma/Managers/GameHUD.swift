@@ -225,8 +225,6 @@ final class GameHUD {
         GameTheme.attachShadow(to: completeTitleLabel)
         GameTheme.attachShadow(to: completeMessageLabel)
         GameTheme.attachShadow(to: completeSubLabel)
-
-        layout(for: sceneSize)
     }
 
     func add(to scene: SKScene) {

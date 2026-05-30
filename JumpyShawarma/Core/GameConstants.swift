@@ -36,19 +36,17 @@ enum GameConstants {
 
 enum GameHUDLayout {
     static let scoreBadgeSize = CGSize(width: 136, height: 84)
-    static let hudTopInset: CGFloat = 12
-    static let badgeCenterOffsetFromHudTop: CGFloat = 38
+    static let hudTopInset: CGFloat = 8
     static let captionOffsetFromBadgeCenter: CGFloat = 18
     static let scoreOffsetFromBadgeCenter: CGFloat = 20
 
-    static func badgeCenterY(sceneHeight: CGFloat, safeAreaTop: CGFloat) -> CGFloat {
-        let hudTop = sceneHeight - safeAreaTop - hudTopInset
-        return hudTop - badgeCenterOffsetFromHudTop
+    /// SwiftUI padding and SpriteKit HUD share this top inset below the safe area.
+    static func hudTopPadding(safeAreaTop: CGFloat) -> CGFloat {
+        safeAreaTop + hudTopInset
     }
 
-    static func scoreBadgeTopFromScreenTop(sceneHeight: CGFloat, safeAreaTop: CGFloat) -> CGFloat {
-        let badgeTopFromBottom = badgeCenterY(sceneHeight: sceneHeight, safeAreaTop: safeAreaTop)
-            + scoreBadgeSize.height / 2
-        return sceneHeight - badgeTopFromBottom
+    static func badgeCenterY(sceneHeight: CGFloat, safeAreaTop: CGFloat) -> CGFloat {
+        let badgeTop = hudTopPadding(safeAreaTop: safeAreaTop)
+        return sceneHeight - badgeTop - scoreBadgeSize.height / 2
     }
 }

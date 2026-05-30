@@ -110,58 +110,54 @@ struct GameContainerView: View {
     }
 
     var body: some View {
-        ZStack {
-            level.theme.swiftUIBackground
-                .ignoresSafeArea()
+        GeometryReader { proxy in
+            let safeTop = proxy.safeAreaInsets.top
 
-            if let scene {
-                GameSpriteView(scene: scene, backgroundColor: level.theme.background)
+            ZStack {
+                level.theme.swiftUIBackground
                     .ignoresSafeArea()
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .topLeading) {
-            if showsLevelsButton {
-                Button(action: {
-                    UISounds.playButtonTap()
-                    onExit()
-                }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chevron.left")
-                        Text("Levels")
-                    }
-                    .font(.custom("AvenirNext-DemiBold", size: 15))
-                    .foregroundStyle(level.theme.swiftUIAccent)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(level.theme.swiftUIAccent.opacity(0.18), in: Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(level.theme.swiftUIAccent.opacity(0.55), lineWidth: 1.5)
-                    )
+
+                if let scene {
+                    GameSpriteView(scene: scene, backgroundColor: level.theme.background)
+                        .ignoresSafeArea()
                 }
-                .padding(.leading, 16)
-                .padding(
-                    .top,
-                    GameHUDLayout.scoreBadgeTopFromScreenTop(
-                        sceneHeight: scene?.size.height ?? fallbackSceneHeight,
-                        safeAreaTop: safeAreaTop
-                    )
-                )
             }
-        }
-        .background {
-            GeometryReader { proxy in
-                Color.clear
-                    .onAppear {
-                        updateSceneLayout(size: proxy.size, safeAreaTop: proxy.safeAreaInsets.top)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: .topLeading) {
+                if showsLevelsButton {
+                    Button(action: {
+                        UISounds.playButtonTap()
+                        onExit()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "chevron.left")
+                            Text("Levels")
+                        }
+                        .font(.custom("AvenirNext-DemiBold", size: 15))
+                        .foregroundStyle(level.theme.swiftUIAccent)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(level.theme.swiftUIAccent.opacity(0.18), in: Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(level.theme.swiftUIAccent.opacity(0.55), lineWidth: 1.5)
+                        )
                     }
-                    .onChange(of: proxy.size) { _, newSize in
-                        updateSceneLayout(size: newSize, safeAreaTop: proxy.safeAreaInsets.top)
-                    }
-                    .onChange(of: proxy.safeAreaInsets.top) { _, newTop in
-                        updateSceneLayout(size: proxy.size, safeAreaTop: newTop)
-                    }
+                    .padding(.leading, 16)
+                    .padding(.top, GameHUDLayout.hudTopPadding(safeAreaTop: safeTop))
+                }
+            }
+            .onAppear {
+                syncLayout(size: proxy.size, safeAreaTop: safeTop)
+            }
+            .onChange(of: proxy.size) { _, newSize in
+                syncLayout(size: newSize, safeAreaTop: proxy.safeAreaInsets.top)
+            }
+            .onChange(of: proxy.safeAreaInsets.top) { _, newTop in
+                syncLayout(size: proxy.size, safeAreaTop: newTop)
+            }
+            .onChange(of: scene != nil) { _, _ in
+                syncLayout(size: proxy.size, safeAreaTop: proxy.safeAreaInsets.top)
             }
         }
         .task(id: level.id) {
@@ -177,6 +173,17 @@ struct GameContainerView: View {
         }
     }
 
+    private func syncLayout(size: CGSize, safeAreaTop: CGFloat) {
+        self.safeAreaTop = safeAreaTop
+        guard let scene else { return }
+        guard size.width > 0, size.height > 0 else { return }
+
+        if !freezesSceneLayout {
+            scene.size = size
+        }
+        scene.applySafeArea(top: safeAreaTop)
+    }
+
     private func wireScene(_ scene: GameScene) {
         scene.onNextLevel = onNextLevel
         scene.onWatchAdToContinue = { completion in
@@ -189,14 +196,5 @@ struct GameContainerView: View {
                 || state == .levelComplete
         }
         showsLevelsButton = true
-    }
-
-    private func updateSceneLayout(size: CGSize, safeAreaTop: CGFloat) {
-        guard let scene else { return }
-        guard size.width > 0, size.height > 0 else { return }
-        guard !freezesSceneLayout else { return }
-        self.safeAreaTop = safeAreaTop
-        scene.size = size
-        scene.applySafeArea(top: safeAreaTop)
     }
 }

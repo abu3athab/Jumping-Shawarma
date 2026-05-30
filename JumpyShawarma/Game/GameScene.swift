@@ -50,6 +50,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         guard size.width > 0, size.height > 0 else { return }
 
         GroundBuilder.reposition(ground, sceneWidth: size.width)
+        BackgroundBuilder.applySafeArea(top: safeAreaTop, in: self, theme: level.theme)
         hud.layout(for: size, safeAreaTop: safeAreaTop)
 
         switch state {
@@ -67,13 +68,14 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     func applySafeArea(top: CGFloat) {
         safeAreaTop = top
         guard isSetup else { return }
-        guard state == .ready else {
-            hud.layout(for: size, safeAreaTop: top)
-            return
-        }
-        GroundBuilder.reposition(ground, sceneWidth: size.width)
+
+        BackgroundBuilder.applySafeArea(top: top, in: self, theme: level.theme)
         hud.layout(for: size, safeAreaTop: top)
-        BirdNode.reset(bird, in: size)
+        GroundBuilder.reposition(ground, sceneWidth: size.width)
+
+        if state == .ready {
+            BirdNode.reset(bird, in: size)
+        }
     }
 
     private func reflowWorldPositions(from oldSize: CGSize, to newSize: CGSize) {
@@ -127,6 +129,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         hud.add(to: self)
 
         isSetup = true
+        applySafeArea(top: safeAreaTop)
         primeAudioEngine()
         enterReadyState()
     }
