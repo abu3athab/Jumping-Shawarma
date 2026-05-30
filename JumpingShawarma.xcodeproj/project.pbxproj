@@ -24,6 +24,7 @@
 		A1000001000000000000000F /* LevelConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000010 /* LevelConfig.swift */; };
 		A10000010000000000000010 /* LevelProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000011 /* LevelProgress.swift */; };
 		A10000010000000000000011 /* LevelSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000012 /* LevelSelectView.swift */; };
+		A10000010000000000000012 /* GameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013 /* GameSpriteView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		A10000020000000000000010 /* LevelConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelConfig.swift; sourceTree = "<group>"; };
 		A10000020000000000000011 /* LevelProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelProgress.swift; sourceTree = "<group>"; };
 		A10000020000000000000012 /* LevelSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelSelectView.swift; sourceTree = "<group>"; };
+		A10000020000000000000013 /* GameSpriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSpriteView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 			children = (
 				A10000020000000000000001 /* JumpingShawarmaApp.swift */,
 				A10000020000000000000012 /* LevelSelectView.swift */,
+				A10000020000000000000013 /* GameSpriteView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -217,6 +220,7 @@
 			files = (
 				A10000010000000000000001 /* JumpingShawarmaApp.swift in Sources */,
 				A10000010000000000000011 /* LevelSelectView.swift in Sources */,
+				A10000010000000000000012 /* GameSpriteView.swift in Sources */,
 				A10000010000000000000002 /* GameScene.swift in Sources */,
 				A10000010000000000000004 /* GameConstants.swift in Sources */,
 				A10000010000000000000005 /* PhysicsCategory.swift in Sources */,

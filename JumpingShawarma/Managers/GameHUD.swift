@@ -26,35 +26,38 @@ final class GameHUD {
 
     private var isNextLevelEnabled = false
     private var panelCenter = CGPoint.zero
+    private let theme: ThemePalette
 
-    init(sceneSize: CGSize) {
+    init(sceneSize: CGSize, theme: ThemePalette) {
+        self.theme = theme
+
         scoreBadge = SKShapeNode(rectOf: GameHUDLayout.scoreBadgeSize, cornerRadius: 14)
         scoreBadge.fillColor = GameTheme.color(0.1, 0.07, 0.06, 0.72)
-        scoreBadge.strokeColor = GameTheme.gold.withAlphaComponent(0.55)
+        scoreBadge.strokeColor = theme.accent.withAlphaComponent(0.55)
         scoreBadge.lineWidth = 2
         scoreBadge.zPosition = 19
 
         scoreCaptionLabel = SKLabelNode(fontNamed: GameTheme.bodyFont)
         scoreCaptionLabel.fontSize = 13
-        scoreCaptionLabel.fontColor = GameTheme.cream.withAlphaComponent(0.85)
+        scoreCaptionLabel.fontColor = theme.textPrimary.withAlphaComponent(0.85)
         scoreCaptionLabel.verticalAlignmentMode = .center
         scoreCaptionLabel.zPosition = 20
 
         scoreLabel = SKLabelNode(fontNamed: GameTheme.scoreFont)
         scoreLabel.fontSize = 30
-        scoreLabel.fontColor = GameTheme.gold
+        scoreLabel.fontColor = theme.accent
         scoreLabel.verticalAlignmentMode = .center
         scoreLabel.zPosition = 20
         scoreLabel.text = "0"
 
         messageLabel = SKLabelNode(fontNamed: GameTheme.titleFont)
         messageLabel.fontSize = 30
-        messageLabel.fontColor = GameTheme.cream
+        messageLabel.fontColor = theme.textPrimary
         messageLabel.zPosition = 20
 
         subMessageLabel = SKLabelNode(fontNamed: GameTheme.bodyFont)
         subMessageLabel.fontSize = 17
-        subMessageLabel.fontColor = GameTheme.gold.withAlphaComponent(0.95)
+        subMessageLabel.fontColor = theme.accent.withAlphaComponent(0.95)
         subMessageLabel.zPosition = 20
 
         completeOverlay = SKShapeNode(rectOf: CGSize(width: 10, height: 10))
@@ -65,14 +68,14 @@ final class GameHUD {
 
         completePanel = SKShapeNode(rectOf: CGSize(width: 300, height: 280), cornerRadius: 22)
         completePanel.fillColor = GameTheme.color(0.12, 0.08, 0.06, 0.94)
-        completePanel.strokeColor = GameTheme.gold
+        completePanel.strokeColor = theme.accent
         completePanel.lineWidth = 3
         completePanel.zPosition = 31
         completePanel.isHidden = true
 
         completeIcon = SKShapeNode(circleOfRadius: 28)
-        completeIcon.fillColor = GameTheme.gold.withAlphaComponent(0.18)
-        completeIcon.strokeColor = GameTheme.gold
+        completeIcon.fillColor = theme.accent.withAlphaComponent(0.18)
+        completeIcon.strokeColor = theme.accent
         completeIcon.lineWidth = 3
         completeIcon.zPosition = 32
         completeIcon.isHidden = true
@@ -80,7 +83,7 @@ final class GameHUD {
         let checkmark = SKLabelNode(fontNamed: GameTheme.titleFont)
         checkmark.text = "✓"
         checkmark.fontSize = 34
-        checkmark.fontColor = GameTheme.gold
+        checkmark.fontColor = theme.accent
         checkmark.verticalAlignmentMode = .center
         checkmark.horizontalAlignmentMode = .center
         checkmark.position = .zero
@@ -89,39 +92,40 @@ final class GameHUD {
 
         completeTitleLabel = SKLabelNode(fontNamed: GameTheme.titleFont)
         completeTitleLabel.fontSize = 28
-        completeTitleLabel.fontColor = GameTheme.gold
+        completeTitleLabel.fontColor = theme.accent
         completeTitleLabel.text = "Level Complete!"
         completeTitleLabel.zPosition = 32
         completeTitleLabel.isHidden = true
 
         completeMessageLabel = SKLabelNode(fontNamed: GameTheme.bodyFont)
         completeMessageLabel.fontSize = 20
-        completeMessageLabel.fontColor = GameTheme.cream
+        completeMessageLabel.fontColor = theme.textPrimary
         completeMessageLabel.zPosition = 32
         completeMessageLabel.isHidden = true
 
         completeSubLabel = SKLabelNode(fontNamed: GameTheme.bodyFont)
         completeSubLabel.fontSize = 16
-        completeSubLabel.fontColor = GameTheme.gold.withAlphaComponent(0.9)
+        completeSubLabel.fontColor = theme.accent.withAlphaComponent(0.9)
         completeSubLabel.zPosition = 32
         completeSubLabel.isHidden = true
 
         completePlayAgainButton = Self.makeButton(
             title: "Play Again",
             name: Self.playAgainButtonName,
-            enabled: true
+            enabled: true,
+            theme: theme
         )
         completeNextButton = Self.makeButton(
             title: "Next",
             name: Self.nextButtonName,
-            enabled: true
+            enabled: true,
+            theme: theme
         )
         completePlayAgainButton.isHidden = true
         completeNextButton.isHidden = true
 
         GameTheme.attachShadow(to: scoreLabel)
         GameTheme.attachShadow(to: messageLabel)
-        GameTheme.attachShadow(to: subMessageLabel)
         GameTheme.attachShadow(to: completeTitleLabel)
         GameTheme.attachShadow(to: completeMessageLabel)
         GameTheme.attachShadow(to: completeSubLabel)
@@ -191,7 +195,6 @@ final class GameHUD {
         messageLabel.text = level.name
         subMessageLabel.text = "Serve \(level.ordersRequired) orders · Tap to start"
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 0.55
     }
 
@@ -200,7 +203,6 @@ final class GameHUD {
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 1.0
         updateScore(0, goal: level.ordersRequired)
     }
@@ -208,9 +210,8 @@ final class GameHUD {
     func showGameOver(score: Int, goal: Int, best: Int) {
         hideLevelComplete()
         messageLabel.text = "Shawarma dropped!"
-        subMessageLabel.text = "Orders \(score)/\(goal) · Best \(best)\nTap to try again"
+        subMessageLabel.text = "Orders \(score)/\(goal) · Best \(best) · Tap to try again"
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 0.75
     }
 
@@ -218,7 +219,6 @@ final class GameHUD {
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 1.0
         updateScore(level.ordersRequired, goal: level.ordersRequired)
 
@@ -268,15 +268,19 @@ final class GameHUD {
     func levelCompleteAction(at point: CGPoint) -> LevelCompleteAction? {
         guard !completeOverlay.isHidden else { return nil }
 
-        if completePlayAgainButton.contains(point) {
-            return .playAgain
-        }
-
-        if completeNextButton.contains(point), isNextLevelEnabled {
+        if buttonHit(completeNextButton, at: point), isNextLevelEnabled {
             return .next
         }
 
+        if buttonHit(completePlayAgainButton, at: point) {
+            return .playAgain
+        }
+
         return nil
+    }
+
+    private func buttonHit(_ button: SKNode, at point: CGPoint) -> Bool {
+        button.calculateAccumulatedFrame().insetBy(dx: -8, dy: -8).contains(point)
     }
 
     func updateScore(_ score: Int, goal: Int) {
@@ -299,7 +303,12 @@ final class GameHUD {
         completeIcon.setScale(1.0)
     }
 
-    private static func makeButton(title: String, name: String, enabled: Bool) -> SKNode {
+    private static func makeButton(
+        title: String,
+        name: String,
+        enabled: Bool,
+        theme: ThemePalette
+    ) -> SKNode {
         let container = SKNode()
         container.name = name
         container.zPosition = 33
@@ -318,30 +327,30 @@ final class GameHUD {
         label.zPosition = 1
         container.addChild(label)
 
-        setButtonEnabled(container, enabled: enabled)
+        applyButtonEnabled(container, enabled: enabled, theme: theme)
         return container
     }
 
-    private static func setButtonEnabled(_ button: SKNode, enabled: Bool) {
+    private static func applyButtonEnabled(_ button: SKNode, enabled: Bool, theme: ThemePalette) {
         guard let background = button.children.compactMap({ $0 as? SKShapeNode }).first,
               let label = button.children.compactMap({ $0 as? SKLabelNode }).first else { return }
 
         if enabled {
-            background.fillColor = GameTheme.gold.withAlphaComponent(0.22)
-            background.strokeColor = GameTheme.gold
+            background.fillColor = theme.accent.withAlphaComponent(0.22)
+            background.strokeColor = theme.accent
             background.lineWidth = 2
-            label.fontColor = GameTheme.gold
+            label.fontColor = theme.accent
             button.alpha = 1.0
         } else {
-            background.fillColor = GameTheme.color(0.2, 0.18, 0.16, 0.5)
-            background.strokeColor = GameTheme.metalLight.withAlphaComponent(0.35)
+            background.fillColor = theme.metalMid.withAlphaComponent(0.5)
+            background.strokeColor = theme.metalLight.withAlphaComponent(0.35)
             background.lineWidth = 1.5
-            label.fontColor = GameTheme.cream.withAlphaComponent(0.35)
+            label.fontColor = theme.textPrimary.withAlphaComponent(0.35)
             button.alpha = 0.65
         }
     }
 
     private func setButtonEnabled(_ button: SKNode, enabled: Bool) {
-        Self.setButtonEnabled(button, enabled: enabled)
+        Self.applyButtonEnabled(button, enabled: enabled, theme: theme)
     }
 }

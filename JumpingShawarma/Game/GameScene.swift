@@ -18,6 +18,8 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     init(size: CGSize, level: LevelConfig) {
         self.level = level
         super.init(size: size)
+        backgroundColor = level.theme.background
+        configureIfNeeded()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -59,9 +61,9 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         guard !isSetup else { return }
         guard size.width > 0, size.height > 0 else { return }
 
-        BackgroundBuilder.add(to: self)
+        BackgroundBuilder.add(to: self, theme: level.theme)
 
-        ground = GroundBuilder.make(in: size)
+        ground = GroundBuilder.make(in: size, theme: level.theme)
         addChild(ground)
 
         bird = BirdNode.make(at: CGPoint(
@@ -70,7 +72,8 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         ))
         addChild(bird)
 
-        hud = GameHUD(sceneSize: size)
+        pipeSpawner.theme = level.theme
+        hud = GameHUD(sceneSize: size, theme: level.theme)
         hud.add(to: self)
 
         isSetup = true
@@ -83,6 +86,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         state = .ready
         onStateChange?(.ready)
         BirdNode.reset(bird, in: size)
+        bird.isHidden = false
         scoreManager.reset()
         pipeSpawner.removeAll(from: self)
         pipeSpawner.resetTimer()
@@ -113,13 +117,25 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         )
     }
 
-    private func completeLevel() {
+    private func beginVictorySequence() {
         guard state.isPlaying else { return }
+
+        state = .victoryRun
+        onStateChange?(.victoryRun)
+        pipeSpawner.disableSpawning()
+        pipeSpawner.exitRemainingObstacles(in: self)
+        BirdNode.disableCollisions(bird)
+
+        BirdNode.playVictoryExit(bird, in: size) { [weak self] in
+            self?.completeLevel()
+        }
+    }
+
+    private func completeLevel() {
+        guard state == .victoryRun else { return }
 
         state = .levelComplete
         onStateChange?(.levelComplete)
-        BirdNode.stop(bird)
-        pipeSpawner.stopPipes(in: self)
         pipeSpawner.removeAll(from: self)
         scoreManager.saveBestIfNeeded()
         LevelProgress.markCompleted(level)
@@ -147,6 +163,8 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
             startGame()
         case .playing:
             BirdNode.flap(bird)
+        case .victoryRun:
+            break
         case .gameOver:
             enterReadyState()
         case .levelComplete:
@@ -173,6 +191,8 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     // MARK: - Contacts
 
     func didBegin(_ contact: SKPhysicsContact) {
+        guard state.isPlaying else { return }
+
         let masks = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
 
         if masks == PhysicsCategory.bird | PhysicsCategory.score {
@@ -196,7 +216,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         hud.updateScore(score, goal: level.ordersRequired)
 
         if score >= level.ordersRequired {
-            completeLevel()
+            beginVictorySequence()
         }
     }
 }

@@ -2,9 +2,16 @@ import SpriteKit
 
 final class PipeSpawner {
     private var lastSpawnTime: TimeInterval = 0
+    private var canSpawn = true
+    var theme: ThemePalette = .nightAlley
 
     func resetTimer() {
         lastSpawnTime = 0
+        canSpawn = true
+    }
+
+    func disableSpawning() {
+        canSpawn = false
     }
 
     func stopPipes(in scene: SKScene) {
@@ -25,7 +32,24 @@ final class PipeSpawner {
         }
     }
 
+    func exitRemainingObstacles(in scene: SKScene) {
+        let names = [PipeNode.pipeName, PipeNode.scoreZoneName, PipeNode.scoredZoneName]
+        for name in names {
+            scene.enumerateChildNodes(withName: name) { node, _ in
+                node.removeAllActions()
+                node.run(.sequence([
+                    SKAction.group([
+                        SKAction.moveBy(x: -scene.size.width - 80, y: 0, duration: GameConstants.obstacleExitDuration),
+                        SKAction.fadeOut(withDuration: GameConstants.obstacleExitDuration),
+                    ]),
+                    SKAction.removeFromParent(),
+                ]))
+            }
+        }
+    }
+
     func update(currentTime: TimeInterval, scene: SKScene) {
+        guard canSpawn else { return }
         if lastSpawnTime == 0 {
             lastSpawnTime = currentTime
         }
@@ -46,11 +70,11 @@ final class PipeSpawner {
         let topHeight = size.height - (centerY + gapHeight / 2)
         let bottomHeight = centerY - gapHeight / 2
 
-        let topPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: topHeight), isTop: true)
+        let topPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: topHeight), isTop: true, theme: theme)
         topPipe.position = CGPoint(x: size.width + pipeWidth, y: size.height - topHeight / 2)
         scene.addChild(topPipe)
 
-        let bottomPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: bottomHeight), isTop: false)
+        let bottomPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: bottomHeight), isTop: false, theme: theme)
         bottomPipe.position = CGPoint(x: size.width + pipeWidth, y: bottomHeight / 2)
         scene.addChild(bottomPipe)
 
