@@ -2,8 +2,8 @@ import AppKit
 import CoreGraphics
 
 let size = 1024
-let outputURL = URL(fileURLWithPath: "/Users/abu_3athab/Desktop/Projects/jumping-shawarma/JumpingShawarma/Assets.xcassets/AppIcon.appiconset/AppIcon.png")
-let shawarmaURL = URL(fileURLWithPath: "/Users/abu_3athab/Desktop/Projects/jumping-shawarma/JumpingShawarma/Assets.xcassets/ShawarmaPlayer.imageset/shawarma-player.png")
+let outputURL = URL(fileURLWithPath: "/Users/abu_3athab/Desktop/Projects/jumpy-shawarma/JumpyShawarma/Assets.xcassets/AppIcon.appiconset/AppIcon.png")
+let shawarmaURL = URL(fileURLWithPath: "/Users/abu_3athab/Desktop/Projects/jumpy-shawarma/JumpyShawarma/Assets.xcassets/ShawarmaPlayer.imageset/shawarma-player.png")
 
 guard let shawarma = NSImage(contentsOf: shawarmaURL) else {
     fputs("Failed to load shawarma image\n", stderr)

@@ -1,10 +1,10 @@
-# Jumping Shawarma 🌯
+# Jumpy Shawarma 🌯
 
 Arcade iOS game built with **SwiftUI + SpriteKit**. Tap to flip the shawarma spit through grill obstacles and serve orders.
 
 ## Run
 
-1. Open `JumpingShawarma.xcodeproj` in Xcode
+1. Open `JumpyShawarma.xcodeproj` in Xcode
 2. Select an iPhone simulator
 3. Press **⌘R**
 
@@ -13,11 +13,11 @@ Arcade iOS game built with **SwiftUI + SpriteKit**. Tap to flip the shawarma spi
 ## Project location
 
 ```
-~/Desktop/Projects/jumping-shawarma/
+~/Desktop/Projects/jumpy-shawarma/
 ├── PLAN.md
-├── JumpingShawarma.xcodeproj
-└── JumpingShawarma/
-    ├── App/JumpingShawarmaApp.swift
+├── JumpyShawarma.xcodeproj
+└── JumpyShawarma/
+    ├── App/JumpyShawarmaApp.swift
     ├── Game/GameScene.swift
     ├── Core/ …
     ├── Nodes/ …
@@ -41,4 +41,4 @@ See **PLAN.md** for v1.1 polish (sounds, sprites, Game Center).
 
 ## Bundle ID
 
-`com.ahmed.jumpingShawarma`
+`com.ahmed.jumpyShawarma`

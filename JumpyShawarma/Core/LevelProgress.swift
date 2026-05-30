@@ -1,7 +1,7 @@
 import Foundation
 
 enum LevelProgress {
-    private static let completedLevelsKey = "jumping_shawarma_completed_levels"
+    private static let completedLevelsKey = "jumpy_shawarma_completed_levels"
 
     static func isCompleted(_ level: LevelConfig) -> Bool {
         isCompleted(level.id)

@@ -18,7 +18,7 @@ struct LevelSelectView: View {
 
             VStack(spacing: 24) {
                 VStack(spacing: 8) {
-                    Text("Jumping Shawarma")
+                    Text("Jumpy Shawarma")
                         .font(.custom("AvenirNext-Heavy", size: 32))
                         .foregroundStyle(DashboardTheme.cream)
 

@@ -2,11 +2,26 @@ import SwiftUI
 import SpriteKit
 
 @main
-struct JumpingShawarmaApp: App {
+struct JumpyShawarmaApp: App {
     @StateObject private var rewardedAdManager = RewardedAdManager()
 
     init() {
+        migrateLegacyUserDefaults()
         UIWindow.appearance().backgroundColor = UIColor(red: 0.42, green: 0.2, blue: 0.16, alpha: 1)
+    }
+
+    private func migrateLegacyUserDefaults() {
+        let defaults = UserDefaults.standard
+
+        if defaults.object(forKey: GameConstants.bestScoreKey) == nil,
+           defaults.object(forKey: "jumping_shawarma_best") != nil {
+            defaults.set(defaults.integer(forKey: "jumping_shawarma_best"), forKey: GameConstants.bestScoreKey)
+        }
+
+        if defaults.object(forKey: "jumpy_shawarma_completed_levels") == nil,
+           let completedLevels = defaults.array(forKey: "jumping_shawarma_completed_levels") {
+            defaults.set(completedLevels, forKey: "jumpy_shawarma_completed_levels")
+        }
     }
 
     var body: some Scene {
