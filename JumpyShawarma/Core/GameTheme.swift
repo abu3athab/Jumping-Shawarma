@@ -53,6 +53,7 @@ enum GameTheme {
 enum LevelThemeID {
     case nightAlley
     case downtownRush
+    case rooftopShift
 }
 
 struct ThemePalette {
@@ -109,5 +110,24 @@ struct ThemePalette {
         awning: GameTheme.color(0.2, 0.55, 0.95),
         silhouette: GameTheme.color(0.04, 0.05, 0.12, 0.75),
         wire: GameTheme.color(0.25, 0.28, 0.4, 0.6)
+    )
+
+    static let rooftopShift = ThemePalette(
+        id: .rooftopShift,
+        background: GameTheme.color(0.3, 0.14, 0.2),
+        accent: GameTheme.color(1.0, 0.62, 0.28),
+        accentSecondary: GameTheme.color(0.95, 0.42, 0.55),
+        accentGlow: GameTheme.color(1.0, 0.48, 0.22, 0.5),
+        textPrimary: GameTheme.color(0.98, 0.9, 0.82),
+        metalDark: GameTheme.color(0.2, 0.14, 0.16),
+        metalMid: GameTheme.color(0.34, 0.24, 0.22),
+        metalLight: GameTheme.color(0.58, 0.46, 0.42),
+        groundDark: GameTheme.color(0.28, 0.18, 0.16),
+        groundLight: GameTheme.color(0.38, 0.26, 0.22),
+        groundGlow: GameTheme.color(1.0, 0.48, 0.22, 0.45),
+        counter: GameTheme.color(0.52, 0.38, 0.32),
+        awning: GameTheme.color(0.72, 0.22, 0.18),
+        silhouette: GameTheme.color(0.12, 0.06, 0.08, 0.65),
+        wire: GameTheme.color(0.35, 0.22, 0.18, 0.55)
     )
 }

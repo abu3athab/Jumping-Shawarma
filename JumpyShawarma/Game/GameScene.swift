@@ -83,6 +83,9 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
             y: bird.position.y * scaleY
         )
         pipeSpawner.scaleObstaclePositions(in: self, scaleX: scaleX, scaleY: scaleY)
+        if state == .playing {
+            pipeSpawner.resumeScroll(in: self)
+        }
         GroundBuilder.reposition(ground, sceneWidth: newSize.width)
     }
 
@@ -115,6 +118,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(bird)
 
         pipeSpawner.theme = level.theme
+        pipeSpawner.level = level
         hud = GameHUD(sceneSize: size, theme: level.theme)
         hud.add(to: self)
 

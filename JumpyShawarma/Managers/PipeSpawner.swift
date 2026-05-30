@@ -4,6 +4,7 @@ final class PipeSpawner {
     private var lastSpawnTime: TimeInterval = 0
     private var canSpawn = true
     var theme: ThemePalette = .nightAlley
+    var level: LevelConfig = .nightAlley
 
     func resetTimer() {
         lastSpawnTime = 0
@@ -15,13 +16,7 @@ final class PipeSpawner {
     }
 
     func stopPipes(in scene: SKScene) {
-        scene.enumerateChildNodes(withName: PipeNode.pipeName) { node, _ in
-            node.removeAllActions()
-        }
-        scene.enumerateChildNodes(withName: PipeNode.scoreZoneName) { node, _ in
-            node.removeAllActions()
-        }
-        scene.enumerateChildNodes(withName: PipeNode.scoredZoneName) { node, _ in
+        enumerateObstacles(in: scene) { node in
             node.removeAllActions()
         }
     }
@@ -46,36 +41,48 @@ final class PipeSpawner {
     }
 
     func scaleObstaclePositions(in scene: SKScene, scaleX: CGFloat, scaleY: CGFloat) {
-        let names = [PipeNode.pipeName, PipeNode.scoreZoneName, PipeNode.scoredZoneName]
-        for name in names {
-            scene.enumerateChildNodes(withName: name) { node, _ in
-                node.removeAllActions()
-                node.position = CGPoint(
-                    x: node.position.x * scaleX,
-                    y: node.position.y * scaleY
-                )
-            }
+        enumerateObstacles(in: scene) { node in
+            node.removeAllActions()
+            node.position = CGPoint(
+                x: node.position.x * scaleX,
+                y: node.position.y * scaleY
+            )
         }
     }
 
     func resumeScroll(in scene: SKScene) {
         let scrollSpeed = GameConstants.pipeSpeed
-        let names = [PipeNode.pipeName, PipeNode.scoreZoneName, PipeNode.scoredZoneName]
+        var nodesByPairX: [Int: [SKNode]] = [:]
 
-        for name in names {
-            scene.enumerateChildNodes(withName: name) { node, _ in
+        enumerateObstacles(in: scene) { node in
+            let remainingDistance = node.position.x + GameConstants.pipeWidth * 2
+            guard remainingDistance > 0 else {
+                node.removeFromParent()
+                return
+            }
+
+            let key = self.pairKey(for: node)
+            nodesByPairX[key, default: []].append(node)
+        }
+
+        for (_, nodes) in nodesByPairX {
+            guard let anchor = nodes.first else { continue }
+
+            let anchorX = pairAnchorX(for: anchor)
+            let remainingDistance = anchorX + GameConstants.pipeWidth * 2
+            let duration = TimeInterval(remainingDistance / scrollSpeed)
+            let phaseDelay = level.hasMovingObstacles
+                ? TimeInterval.random(in: 0...(level.obstacleVerticalDuration * 2))
+                : 0
+            let movement = pairMovementActions(
+                horizontalDuration: duration,
+                removesFromParent: true,
+                phaseDelay: phaseDelay
+            )
+
+            for node in nodes {
                 node.removeAllActions()
-                let remainingDistance = node.position.x + GameConstants.pipeWidth * 2
-                guard remainingDistance > 0 else {
-                    node.removeFromParent()
-                    return
-                }
-
-                let duration = TimeInterval(remainingDistance / scrollSpeed)
-                node.run(.sequence([
-                    SKAction.moveBy(x: -remainingDistance, y: 0, duration: duration),
-                    SKAction.removeFromParent(),
-                ]))
+                node.run(movement.copy() as! SKAction)
             }
         }
     }
@@ -118,19 +125,7 @@ final class PipeSpawner {
         let clearance = GameConstants.continueSpawnClearance
         var pairCenters = Set<Int>()
 
-        scene.enumerateChildNodes(withName: PipeNode.pipeName) { node, _ in
-            if abs(node.position.x - spawnX) <= clearance {
-                pairCenters.insert(Int(node.position.x.rounded()))
-            }
-        }
-
-        scene.enumerateChildNodes(withName: PipeNode.scoreZoneName) { node, _ in
-            if abs(node.position.x - spawnX) <= clearance {
-                pairCenters.insert(Int(node.position.x.rounded()))
-            }
-        }
-
-        scene.enumerateChildNodes(withName: PipeNode.scoredZoneName) { node, _ in
+        enumerateObstacles(in: scene) { node in
             if abs(node.position.x - spawnX) <= clearance {
                 pairCenters.insert(Int(node.position.x.rounded()))
             }
@@ -143,14 +138,11 @@ final class PipeSpawner {
 
     private func removeObstaclePair(nearX x: CGFloat, in scene: SKScene) {
         let tolerance = GameConstants.pipeWidth + 24
-        let names = [PipeNode.pipeName, PipeNode.scoreZoneName, PipeNode.scoredZoneName]
 
-        for name in names {
-            scene.enumerateChildNodes(withName: name) { node, _ in
-                guard abs(node.position.x - x) <= tolerance else { return }
-                node.removeAllActions()
-                node.removeFromParent()
-            }
+        enumerateObstacles(in: scene) { node in
+            guard abs(node.position.x - x) <= tolerance else { return }
+            node.removeAllActions()
+            node.removeFromParent()
         }
     }
 
@@ -159,30 +151,21 @@ final class PipeSpawner {
     }
 
     func removeAll(from scene: SKScene) {
-        scene.enumerateChildNodes(withName: PipeNode.pipeName) { node, _ in
-            node.removeFromParent()
-        }
-        scene.enumerateChildNodes(withName: PipeNode.scoreZoneName) { node, _ in
-            node.removeFromParent()
-        }
-        scene.enumerateChildNodes(withName: PipeNode.scoredZoneName) { node, _ in
+        enumerateObstacles(in: scene) { node in
             node.removeFromParent()
         }
     }
 
     func exitRemainingObstacles(in scene: SKScene) {
-        let names = [PipeNode.pipeName, PipeNode.scoreZoneName, PipeNode.scoredZoneName]
-        for name in names {
-            scene.enumerateChildNodes(withName: name) { node, _ in
-                node.removeAllActions()
-                node.run(.sequence([
-                    SKAction.group([
-                        SKAction.moveBy(x: -scene.size.width - 80, y: 0, duration: GameConstants.obstacleExitDuration),
-                        SKAction.fadeOut(withDuration: GameConstants.obstacleExitDuration),
-                    ]),
-                    SKAction.removeFromParent(),
-                ]))
-            }
+        enumerateObstacles(in: scene) { node in
+            node.removeAllActions()
+            node.run(.sequence([
+                SKAction.group([
+                    SKAction.moveBy(x: -scene.size.width - 80, y: 0, duration: GameConstants.obstacleExitDuration),
+                    SKAction.fadeOut(withDuration: GameConstants.obstacleExitDuration),
+                ]),
+                SKAction.removeFromParent(),
+            ]))
         }
     }
 
@@ -200,10 +183,16 @@ final class PipeSpawner {
         let size = scene.size
         let pipeWidth = GameConstants.pipeWidth
         let gapHeight = GameConstants.gapHeight
-        let minMargin: CGFloat = 120
-        let maxY = size.height - minMargin - gapHeight / 2
-        let minY = minMargin + gapHeight / 2 + 80
-        let centerY = CGFloat.random(in: minY...maxY)
+        let amplitude = level.hasMovingObstacles ? level.obstacleVerticalAmplitude : 0
+        let edgeMargin: CGFloat = 120 + amplitude * 0.35
+        let maxY = size.height - edgeMargin - gapHeight / 2 - amplitude
+        let minY = max(
+            GameConstants.groundHeight + gapHeight / 2 + amplitude + 28,
+            edgeMargin + gapHeight / 2 + amplitude * 0.5
+        )
+        let centerY = minY <= maxY
+            ? CGFloat.random(in: minY...maxY)
+            : (minY + maxY) / 2
 
         let topHeight = size.height - (centerY + gapHeight / 2)
         let bottomHeight = centerY - gapHeight / 2
@@ -224,13 +213,73 @@ final class PipeSpawner {
 
         let distance = size.width + pipeWidth * 2
         let duration = distance / GameConstants.pipeSpeed
-        let scroll = SKAction.sequence([
-            SKAction.moveBy(x: -distance, y: 0, duration: duration),
-            SKAction.removeFromParent(),
+        let phaseDelay = level.hasMovingObstacles
+            ? TimeInterval.random(in: 0...(level.obstacleVerticalDuration * 2))
+            : 0
+        let movement = pairMovementActions(
+            horizontalDuration: duration,
+            removesFromParent: true,
+            phaseDelay: phaseDelay
+        )
+
+        topPipe.run(movement.copy() as! SKAction)
+        bottomPipe.run(movement.copy() as! SKAction)
+        scoreZone.run(movement.copy() as! SKAction)
+    }
+
+    private func pairMovementActions(
+        horizontalDuration: TimeInterval,
+        removesFromParent: Bool,
+        phaseDelay: TimeInterval = 0
+    ) -> SKAction {
+        let distance = horizontalDuration * GameConstants.pipeSpeed
+        let scrollAction: SKAction
+        if removesFromParent {
+            scrollAction = SKAction.sequence([
+                SKAction.moveBy(x: -distance, y: 0, duration: horizontalDuration),
+                SKAction.removeFromParent(),
+            ])
+        } else {
+            scrollAction = SKAction.moveBy(x: -distance, y: 0, duration: horizontalDuration)
+        }
+
+        guard level.hasMovingObstacles else { return scrollAction }
+
+        let amplitude = level.obstacleVerticalAmplitude
+        let halfCycle = level.obstacleVerticalDuration
+        let delay = phaseDelay > 0
+            ? phaseDelay
+            : TimeInterval.random(in: 0...(halfCycle * 2))
+
+        let oscillate = SKAction.repeatForever(.sequence([
+            SKAction.moveBy(x: 0, y: amplitude, duration: halfCycle),
+            SKAction.moveBy(x: 0, y: -amplitude, duration: halfCycle),
+        ]))
+
+        let vertical = SKAction.sequence([
+            SKAction.wait(forDuration: delay),
+            oscillate,
         ])
 
-        topPipe.run(scroll)
-        bottomPipe.run(scroll)
-        scoreZone.run(scroll)
+        return SKAction.group([scrollAction, vertical])
+    }
+
+    private func enumerateObstacles(in scene: SKScene, body: @escaping (SKNode) -> Void) {
+        for name in [PipeNode.pipeName, PipeNode.scoreZoneName, PipeNode.scoredZoneName] {
+            scene.enumerateChildNodes(withName: name) { node, _ in
+                body(node)
+            }
+        }
+    }
+
+    private func pairAnchorX(for node: SKNode) -> CGFloat {
+        if node.name == PipeNode.scoreZoneName || node.name == PipeNode.scoredZoneName {
+            return node.position.x - 10
+        }
+        return node.position.x
+    }
+
+    private func pairKey(for node: SKNode) -> Int {
+        Int(pairAnchorX(for: node).rounded())
     }
 }

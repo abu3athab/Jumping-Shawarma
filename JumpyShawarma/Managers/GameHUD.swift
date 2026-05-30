@@ -318,7 +318,7 @@ final class GameHUD {
         scoreCaptionLabel.text = "LEVEL \(level.id) · ORDERS"
         updateScore(0, goal: level.ordersRequired)
         messageLabel.text = level.name
-        subMessageLabel.text = "Serve \(level.ordersRequired) orders · Tap to start"
+        subMessageLabel.text = level.readySubtitle
         GameTheme.syncShadow(on: messageLabel)
         scoreBadge.alpha = 0.55
     }
