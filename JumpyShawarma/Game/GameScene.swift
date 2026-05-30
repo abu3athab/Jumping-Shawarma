@@ -120,6 +120,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         ))
         addChild(bird)
         BirdNode.preloadSounds()
+        PipeNode.preloadTextures()
 
         pipeSpawner.theme = level.theme
         pipeSpawner.level = level

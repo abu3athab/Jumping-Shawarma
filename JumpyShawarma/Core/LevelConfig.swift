@@ -39,6 +39,13 @@ enum LevelConfig: Int, CaseIterable {
         }
     }
 
+    var pipeWidth: CGFloat {
+        switch self {
+        case .nightAlley: return 74
+        case .downtownRush, .rooftopShift: return 58
+        }
+    }
+
     var hasMovingObstacles: Bool {
         switch self {
         case .rooftopShift: return true
