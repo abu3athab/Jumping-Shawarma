@@ -3,6 +3,7 @@ import SpriteKit
 final class PipeSpawner {
     private var lastSpawnTime: TimeInterval = 0
     private var canSpawn = true
+    var theme: ThemePalette = .nightAlley
 
     func resetTimer() {
         lastSpawnTime = 0
@@ -69,11 +70,11 @@ final class PipeSpawner {
         let topHeight = size.height - (centerY + gapHeight / 2)
         let bottomHeight = centerY - gapHeight / 2
 
-        let topPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: topHeight), isTop: true)
+        let topPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: topHeight), isTop: true, theme: theme)
         topPipe.position = CGPoint(x: size.width + pipeWidth, y: size.height - topHeight / 2)
         scene.addChild(topPipe)
 
-        let bottomPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: bottomHeight), isTop: false)
+        let bottomPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: bottomHeight), isTop: false, theme: theme)
         bottomPipe.position = CGPoint(x: size.width + pipeWidth, y: bottomHeight / 2)
         scene.addChild(bottomPipe)
 

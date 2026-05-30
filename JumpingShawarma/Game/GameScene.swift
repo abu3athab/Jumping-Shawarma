@@ -18,6 +18,8 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     init(size: CGSize, level: LevelConfig) {
         self.level = level
         super.init(size: size)
+        backgroundColor = level.theme.background
+        configureIfNeeded()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -59,9 +61,9 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         guard !isSetup else { return }
         guard size.width > 0, size.height > 0 else { return }
 
-        BackgroundBuilder.add(to: self)
+        BackgroundBuilder.add(to: self, theme: level.theme)
 
-        ground = GroundBuilder.make(in: size)
+        ground = GroundBuilder.make(in: size, theme: level.theme)
         addChild(ground)
 
         bird = BirdNode.make(at: CGPoint(
@@ -70,7 +72,8 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         ))
         addChild(bird)
 
-        hud = GameHUD(sceneSize: size)
+        pipeSpawner.theme = level.theme
+        hud = GameHUD(sceneSize: size, theme: level.theme)
         hud.add(to: self)
 
         isSetup = true

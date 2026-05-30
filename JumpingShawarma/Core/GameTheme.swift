@@ -49,3 +49,65 @@ enum GameTheme {
         ])))
     }
 }
+
+enum LevelThemeID {
+    case nightAlley
+    case downtownRush
+}
+
+struct ThemePalette {
+    let id: LevelThemeID
+    let background: SKColor
+    let accent: SKColor
+    let accentSecondary: SKColor
+    let accentGlow: SKColor
+    let textPrimary: SKColor
+    let metalDark: SKColor
+    let metalMid: SKColor
+    let metalLight: SKColor
+    let groundDark: SKColor
+    let groundLight: SKColor
+    let groundGlow: SKColor
+    let counter: SKColor
+    let awning: SKColor
+    let silhouette: SKColor
+    let wire: SKColor
+
+    static let nightAlley = ThemePalette(
+        id: .nightAlley,
+        background: GameTheme.color(0.42, 0.2, 0.16),
+        accent: GameTheme.color(1.0, 0.84, 0.35),
+        accentSecondary: GameTheme.color(1.0, 0.45, 0.12),
+        accentGlow: GameTheme.color(1.0, 0.62, 0.18, 0.55),
+        textPrimary: GameTheme.color(0.98, 0.93, 0.82),
+        metalDark: GameTheme.color(0.18, 0.16, 0.15),
+        metalMid: GameTheme.color(0.32, 0.29, 0.27),
+        metalLight: GameTheme.color(0.58, 0.54, 0.5),
+        groundDark: GameTheme.color(0.34, 0.26, 0.2),
+        groundLight: GameTheme.color(0.42, 0.33, 0.26),
+        groundGlow: GameTheme.color(1.0, 0.62, 0.18, 0.55),
+        counter: GameTheme.color(0.72, 0.7, 0.66),
+        awning: GameTheme.color(0.62, 0.14, 0.12),
+        silhouette: GameTheme.color(0.08, 0.05, 0.06, 0.55),
+        wire: GameTheme.color(0.2, 0.16, 0.14, 0.7)
+    )
+
+    static let downtownRush = ThemePalette(
+        id: .downtownRush,
+        background: GameTheme.color(0.07, 0.09, 0.2),
+        accent: GameTheme.color(0.35, 0.92, 1.0),
+        accentSecondary: GameTheme.color(1.0, 0.35, 0.78),
+        accentGlow: GameTheme.color(0.35, 0.92, 1.0, 0.45),
+        textPrimary: GameTheme.color(0.92, 0.95, 1.0),
+        metalDark: GameTheme.color(0.14, 0.16, 0.24),
+        metalMid: GameTheme.color(0.22, 0.24, 0.34),
+        metalLight: GameTheme.color(0.45, 0.48, 0.58),
+        groundDark: GameTheme.color(0.16, 0.17, 0.22),
+        groundLight: GameTheme.color(0.22, 0.23, 0.3),
+        groundGlow: GameTheme.color(1.0, 0.35, 0.78, 0.45),
+        counter: GameTheme.color(0.28, 0.3, 0.38),
+        awning: GameTheme.color(0.2, 0.55, 0.95),
+        silhouette: GameTheme.color(0.04, 0.05, 0.12, 0.75),
+        wire: GameTheme.color(0.25, 0.28, 0.4, 0.6)
+    )
+}
