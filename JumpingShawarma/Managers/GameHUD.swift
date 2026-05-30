@@ -5,9 +5,16 @@ enum LevelCompleteAction {
     case playAgain
 }
 
+enum GameOverAction {
+    case watchAd
+    case retry
+}
+
 final class GameHUD {
     static let nextButtonName = "levelCompleteNext"
     static let playAgainButtonName = "levelCompletePlayAgain"
+    static let watchAdButtonName = "gameOverWatchAd"
+    static let retryButtonName = "gameOverRetry"
 
     let scoreLabel: SKLabelNode
     let scoreCaptionLabel: SKLabelNode
@@ -23,10 +30,29 @@ final class GameHUD {
     private let completeSubLabel: SKLabelNode
     private let completeNextButton: SKNode
     private let completePlayAgainButton: SKNode
+    private let gameOverOverlay: SKShapeNode
+    private let gameOverPanel: SKShapeNode
+    private let gameOverTitleLabel: SKLabelNode
+    private let gameOverSubLabel: SKLabelNode
+    private let gameOverWatchAdButton: SKNode
+    private let gameOverRetryButton: SKNode
+    private let countdownOverlay: SKShapeNode
+    private let countdownLabel: SKLabelNode
+    private let countdownCaptionLabel: SKLabelNode
 
     private var isNextLevelEnabled = false
+    private var canWatchAdToContinue = false
     private var panelCenter = CGPoint.zero
     private let theme: ThemePalette
+
+    private enum GameOverLayout {
+        static let panelSize = CGSize(width: 300, height: 252)
+        static let titleY: CGFloat = 64
+        static let subtitleY: CGFloat = 28
+        static let buttonsY: CGFloat = -58
+        static let buttonSpacing: CGFloat = 72
+        static let singleButtonY: CGFloat = -58
+    }
 
     init(sceneSize: CGSize, theme: ThemePalette) {
         self.theme = theme
@@ -124,6 +150,76 @@ final class GameHUD {
         completePlayAgainButton.isHidden = true
         completeNextButton.isHidden = true
 
+        gameOverOverlay = SKShapeNode(rectOf: CGSize(width: 10, height: 10))
+        gameOverOverlay.fillColor = GameTheme.color(0.05, 0.03, 0.02, 0.62)
+        gameOverOverlay.strokeColor = .clear
+        gameOverOverlay.zPosition = 30
+        gameOverOverlay.isHidden = true
+
+        gameOverPanel = SKShapeNode(rectOf: GameOverLayout.panelSize, cornerRadius: 22)
+        gameOverPanel.fillColor = GameTheme.color(0.12, 0.08, 0.06, 0.94)
+        gameOverPanel.strokeColor = theme.accent
+        gameOverPanel.lineWidth = 3
+        gameOverPanel.zPosition = 31
+        gameOverPanel.isHidden = true
+
+        gameOverTitleLabel = SKLabelNode(fontNamed: GameTheme.titleFont)
+        gameOverTitleLabel.fontSize = 26
+        gameOverTitleLabel.fontColor = theme.textPrimary
+        gameOverTitleLabel.text = "Shawarma dropped!"
+        gameOverTitleLabel.verticalAlignmentMode = .center
+        gameOverTitleLabel.horizontalAlignmentMode = .center
+        gameOverTitleLabel.zPosition = 32
+        gameOverTitleLabel.isHidden = true
+
+        gameOverSubLabel = SKLabelNode(fontNamed: GameTheme.bodyFont)
+        gameOverSubLabel.fontSize = 15
+        gameOverSubLabel.fontColor = theme.accent.withAlphaComponent(0.9)
+        gameOverSubLabel.verticalAlignmentMode = .center
+        gameOverSubLabel.horizontalAlignmentMode = .center
+        gameOverSubLabel.zPosition = 32
+        gameOverSubLabel.isHidden = true
+
+        gameOverWatchAdButton = Self.makeButton(
+            title: "Keep Cooking",
+            name: Self.watchAdButtonName,
+            enabled: true,
+            theme: theme,
+            width: 128
+        )
+        gameOverRetryButton = Self.makeButton(
+            title: "Retry",
+            name: Self.retryButtonName,
+            enabled: true,
+            theme: theme,
+            width: 108,
+            style: .secondary
+        )
+        gameOverWatchAdButton.isHidden = true
+        gameOverRetryButton.isHidden = true
+
+        countdownOverlay = SKShapeNode(rectOf: CGSize(width: 10, height: 10))
+        countdownOverlay.fillColor = GameTheme.color(0.05, 0.03, 0.02, 0.45)
+        countdownOverlay.strokeColor = .clear
+        countdownOverlay.zPosition = 34
+        countdownOverlay.isHidden = true
+
+        countdownLabel = SKLabelNode(fontNamed: GameTheme.titleFont)
+        countdownLabel.fontSize = 84
+        countdownLabel.fontColor = theme.accent
+        countdownLabel.verticalAlignmentMode = .center
+        countdownLabel.horizontalAlignmentMode = .center
+        countdownLabel.zPosition = 35
+        countdownLabel.isHidden = true
+
+        countdownCaptionLabel = SKLabelNode(fontNamed: GameTheme.bodyFont)
+        countdownCaptionLabel.fontSize = 22
+        countdownCaptionLabel.fontColor = theme.textPrimary
+        countdownCaptionLabel.verticalAlignmentMode = .center
+        countdownCaptionLabel.horizontalAlignmentMode = .center
+        countdownCaptionLabel.zPosition = 35
+        countdownCaptionLabel.isHidden = true
+
         GameTheme.attachShadow(to: scoreLabel)
         GameTheme.attachShadow(to: messageLabel)
         GameTheme.attachShadow(to: completeTitleLabel)
@@ -147,6 +243,15 @@ final class GameHUD {
         scene.addChild(completeSubLabel)
         scene.addChild(completePlayAgainButton)
         scene.addChild(completeNextButton)
+        scene.addChild(gameOverOverlay)
+        scene.addChild(gameOverPanel)
+        scene.addChild(gameOverTitleLabel)
+        scene.addChild(gameOverSubLabel)
+        scene.addChild(gameOverWatchAdButton)
+        scene.addChild(gameOverRetryButton)
+        scene.addChild(countdownOverlay)
+        scene.addChild(countdownCaptionLabel)
+        scene.addChild(countdownLabel)
     }
 
     func layout(for sceneSize: CGSize, safeAreaTop: CGFloat = 0) {
@@ -176,6 +281,9 @@ final class GameHUD {
         completePlayAgainButton.position = CGPoint(x: panelCenter.x - 72, y: panelCenter.y - 88)
         completeNextButton.position = CGPoint(x: panelCenter.x + 72, y: panelCenter.y - 88)
 
+        gameOverPanel.position = panelCenter
+        layoutGameOverContent(canContinue: canWatchAdToContinue)
+
         completeOverlay.path = CGPath(
             rect: CGRect(
                 x: -sceneSize.width / 2,
@@ -186,9 +294,26 @@ final class GameHUD {
             transform: nil
         )
         completeOverlay.position = CGPoint(x: sceneSize.width / 2, y: sceneSize.height / 2)
+
+        gameOverOverlay.path = CGPath(
+            rect: CGRect(
+                x: -sceneSize.width / 2,
+                y: -sceneSize.height / 2,
+                width: sceneSize.width,
+                height: sceneSize.height
+            ),
+            transform: nil
+        )
+        gameOverOverlay.position = CGPoint(x: sceneSize.width / 2, y: sceneSize.height / 2)
+
+        countdownOverlay.path = gameOverOverlay.path
+        countdownOverlay.position = gameOverOverlay.position
+        countdownLabel.position = panelCenter
+        countdownCaptionLabel.position = CGPoint(x: panelCenter.x, y: panelCenter.y + 72)
     }
 
     func showReady(level: LevelConfig) {
+        hideGameOver()
         hideLevelComplete()
         scoreCaptionLabel.text = "LEVEL \(level.id) · ORDERS"
         updateScore(0, goal: level.ordersRequired)
@@ -199,6 +324,7 @@ final class GameHUD {
     }
 
     func showPlaying(level: LevelConfig) {
+        hideGameOver()
         hideLevelComplete()
         messageLabel.text = ""
         subMessageLabel.text = ""
@@ -207,15 +333,101 @@ final class GameHUD {
         updateScore(0, goal: level.ordersRequired)
     }
 
-    func showGameOver(score: Int, goal: Int, best: Int) {
+    func showPlaying(score: Int, goal: Int) {
+        hideGameOver()
         hideLevelComplete()
-        messageLabel.text = "Shawarma dropped!"
-        subMessageLabel.text = "Orders \(score)/\(goal) · Best \(best) · Tap to try again"
+        messageLabel.text = ""
+        subMessageLabel.text = ""
+        GameTheme.syncShadow(on: messageLabel)
+        scoreBadge.alpha = 1.0
+        updateScore(score, goal: goal)
+    }
+
+    func showGameOver(score: Int, goal: Int, best: Int, canContinue: Bool) {
+        hideLevelComplete()
+        canWatchAdToContinue = canContinue
+
+        messageLabel.text = ""
+        subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
         scoreBadge.alpha = 0.75
+        updateScore(score, goal: goal)
+
+        gameOverOverlay.isHidden = false
+        gameOverPanel.isHidden = false
+        gameOverTitleLabel.isHidden = false
+        gameOverSubLabel.isHidden = false
+        gameOverRetryButton.isHidden = false
+        gameOverWatchAdButton.isHidden = !canContinue
+
+        gameOverTitleLabel.text = "Shawarma dropped!"
+        gameOverSubLabel.text = "Orders \(score)/\(goal) · Best \(best)"
+        GameTheme.syncShadow(on: gameOverTitleLabel)
+
+        setButtonEnabled(gameOverWatchAdButton, enabled: canContinue, style: .primary)
+        setButtonEnabled(gameOverRetryButton, enabled: true, style: .secondary)
+        layoutGameOverContent(canContinue: canContinue)
+
+        gameOverPanel.setScale(0.9)
+        gameOverPanel.alpha = 0
+        gameOverPanel.run(.group([
+            .fadeIn(withDuration: 0.18),
+            .scale(to: 1.0, duration: 0.22),
+        ]))
+    }
+
+    func showGameOver(score: Int, goal: Int, best: Int) {
+        showGameOver(score: score, goal: goal, best: best, canContinue: false)
+    }
+
+    func showContinueCountdown(completion: @escaping () -> Void) {
+        hideGameOver()
+        hideLevelComplete()
+
+        countdownOverlay.isHidden = false
+        countdownLabel.isHidden = false
+        countdownCaptionLabel.isHidden = false
+        countdownCaptionLabel.text = "Get ready!"
+        countdownLabel.text = "3"
+        countdownLabel.setScale(0.5)
+        countdownLabel.alpha = 1.0
+        countdownLabel.removeAction(forKey: "continueCountdown")
+
+        let step = GameConstants.continueCountdownStepDuration
+        let sequence = SKAction.sequence([
+            countdownStep("3", duration: step),
+            countdownStep("2", duration: step),
+            countdownStep("1", duration: step),
+            SKAction.run { [weak self] in
+                self?.countdownCaptionLabel.text = "Go!"
+                self?.countdownLabel.text = ""
+            },
+            SKAction.wait(forDuration: step * 0.45),
+            SKAction.run { [weak self] in
+                self?.hideContinueCountdown()
+                completion()
+            },
+        ])
+
+        countdownLabel.run(sequence, withKey: "continueCountdown")
+    }
+
+    func gameOverAction(at point: CGPoint) -> GameOverAction? {
+        guard !gameOverOverlay.isHidden else { return nil }
+
+        if canWatchAdToContinue, buttonHit(gameOverWatchAdButton, at: point) {
+            return .watchAd
+        }
+
+        if buttonHit(gameOverRetryButton, at: point) {
+            return .retry
+        }
+
+        return nil
     }
 
     func showLevelComplete(level: LevelConfig) {
+        hideGameOver()
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
@@ -288,6 +500,70 @@ final class GameHUD {
         GameTheme.syncShadow(on: scoreLabel)
     }
 
+    private func layoutGameOverContent(canContinue: Bool) {
+        gameOverTitleLabel.position = CGPoint(
+            x: panelCenter.x,
+            y: panelCenter.y + GameOverLayout.titleY
+        )
+        gameOverSubLabel.position = CGPoint(
+            x: panelCenter.x,
+            y: panelCenter.y + GameOverLayout.subtitleY
+        )
+
+        if canContinue {
+            gameOverWatchAdButton.position = CGPoint(
+                x: panelCenter.x - GameOverLayout.buttonSpacing,
+                y: panelCenter.y + GameOverLayout.buttonsY
+            )
+            gameOverRetryButton.position = CGPoint(
+                x: panelCenter.x + GameOverLayout.buttonSpacing,
+                y: panelCenter.y + GameOverLayout.buttonsY
+            )
+        } else {
+            gameOverRetryButton.position = CGPoint(
+                x: panelCenter.x,
+                y: panelCenter.y + GameOverLayout.singleButtonY
+            )
+        }
+    }
+
+    private func hideContinueCountdown() {
+        countdownLabel.removeAction(forKey: "continueCountdown")
+        countdownOverlay.isHidden = true
+        countdownLabel.isHidden = true
+        countdownCaptionLabel.isHidden = true
+        countdownLabel.setScale(1.0)
+    }
+
+    private func countdownStep(_ value: String, duration: TimeInterval) -> SKAction {
+        SKAction.sequence([
+            SKAction.run { [weak self] in
+                self?.countdownLabel.text = value
+                self?.countdownLabel.setScale(0.45)
+                self?.countdownLabel.alpha = 0.2
+            },
+            SKAction.group([
+                SKAction.scale(to: 1.0, duration: duration * 0.35),
+                SKAction.fadeIn(withDuration: duration * 0.25),
+            ]),
+            SKAction.wait(forDuration: duration * 0.65),
+        ])
+    }
+
+    private func hideGameOver() {
+        hideContinueCountdown()
+        gameOverOverlay.isHidden = true
+        gameOverPanel.isHidden = true
+        gameOverTitleLabel.isHidden = true
+        gameOverSubLabel.isHidden = true
+        gameOverWatchAdButton.isHidden = true
+        gameOverRetryButton.isHidden = true
+        gameOverPanel.removeAllActions()
+        gameOverPanel.setScale(1.0)
+        gameOverPanel.alpha = 1.0
+        canWatchAdToContinue = false
+    }
+
     private func hideLevelComplete() {
         completeOverlay.isHidden = true
         completePanel.isHidden = true
@@ -303,43 +579,63 @@ final class GameHUD {
         completeIcon.setScale(1.0)
     }
 
+    private enum ButtonStyle {
+        case primary
+        case secondary
+    }
+
     private static func makeButton(
         title: String,
         name: String,
         enabled: Bool,
-        theme: ThemePalette
+        theme: ThemePalette,
+        width: CGFloat = 118,
+        style: ButtonStyle = .primary
     ) -> SKNode {
         let container = SKNode()
         container.name = name
         container.zPosition = 33
 
-        let background = SKShapeNode(rectOf: CGSize(width: 118, height: 42), cornerRadius: 12)
+        let background = SKShapeNode(rectOf: CGSize(width: width, height: 42), cornerRadius: 12)
         background.name = name
         background.zPosition = 0
         container.addChild(background)
 
         let label = SKLabelNode(fontNamed: GameTheme.bodyFont)
         label.text = title
-        label.fontSize = 16
+        label.fontSize = style == .primary ? 15 : 16
         label.verticalAlignmentMode = .center
         label.horizontalAlignmentMode = .center
         label.name = name
         label.zPosition = 1
         container.addChild(label)
 
-        applyButtonEnabled(container, enabled: enabled, theme: theme)
+        applyButtonEnabled(container, enabled: enabled, theme: theme, style: style)
         return container
     }
 
-    private static func applyButtonEnabled(_ button: SKNode, enabled: Bool, theme: ThemePalette) {
+    private static func applyButtonEnabled(
+        _ button: SKNode,
+        enabled: Bool,
+        theme: ThemePalette,
+        style: ButtonStyle = .primary
+    ) {
         guard let background = button.children.compactMap({ $0 as? SKShapeNode }).first,
               let label = button.children.compactMap({ $0 as? SKLabelNode }).first else { return }
 
         if enabled {
-            background.fillColor = theme.accent.withAlphaComponent(0.22)
-            background.strokeColor = theme.accent
-            background.lineWidth = 2
-            label.fontColor = theme.accent
+            switch style {
+            case .primary:
+                background.fillColor = theme.accent.withAlphaComponent(0.22)
+                background.strokeColor = theme.accent
+                background.lineWidth = 2
+                label.fontColor = theme.accent
+            case .secondary:
+                background.fillColor = theme.metalMid.withAlphaComponent(0.35)
+                background.strokeColor = theme.textPrimary.withAlphaComponent(0.35)
+                background.lineWidth = 1.5
+                label.fontColor = theme.textPrimary.withAlphaComponent(0.85)
+            }
             button.alpha = 1.0
         } else {
             background.fillColor = theme.metalMid.withAlphaComponent(0.5)
@@ -350,7 +646,7 @@ final class GameHUD {
         }
     }
 
-    private func setButtonEnabled(_ button: SKNode, enabled: Bool) {
-        Self.applyButtonEnabled(button, enabled: enabled, theme: theme)
+    private func setButtonEnabled(_ button: SKNode, enabled: Bool, style: ButtonStyle = .primary) {
+        Self.applyButtonEnabled(button, enabled: enabled, theme: theme, style: style)
     }
 }

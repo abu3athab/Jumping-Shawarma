@@ -24,7 +24,9 @@
 		A1000001000000000000000F /* LevelConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000010 /* LevelConfig.swift */; };
 		A10000010000000000000010 /* LevelProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000011 /* LevelProgress.swift */; };
 		A10000010000000000000011 /* LevelSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000012 /* LevelSelectView.swift */; };
-		A10000010000000000000012 /* GameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013 /* GameSpriteView.swift */; };
+        A10000010000000000000012 /* GameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013 /* GameSpriteView.swift */; };
+		A10000010000000000000013 /* RunSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000014 /* RunSnapshot.swift */; };
+		A10000010000000000000014 /* RewardedAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000015 /* RewardedAdManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +49,8 @@
 		A10000020000000000000011 /* LevelProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelProgress.swift; sourceTree = "<group>"; };
 		A10000020000000000000012 /* LevelSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelSelectView.swift; sourceTree = "<group>"; };
 		A10000020000000000000013 /* GameSpriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSpriteView.swift; sourceTree = "<group>"; };
+		A10000020000000000000014 /* RunSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunSnapshot.swift; sourceTree = "<group>"; };
+		A10000020000000000000015 /* RewardedAdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardedAdManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +119,7 @@
 				A1000002000000000000000F /* GameTheme.swift */,
 				A10000020000000000000010 /* LevelConfig.swift */,
 				A10000020000000000000011 /* LevelProgress.swift */,
+				A10000020000000000000014 /* RunSnapshot.swift */,
 				A10000020000000000000006 /* PhysicsCategory.swift */,
 				A10000020000000000000007 /* GameState.swift */,
 			);
@@ -136,6 +141,7 @@
 				A1000002000000000000000A /* ScoreManager.swift */,
 				A1000002000000000000000B /* GameHUD.swift */,
 				A1000002000000000000000C /* PipeSpawner.swift */,
+				A10000020000000000000015 /* RewardedAdManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -235,6 +241,8 @@
 				A1000001000000000000000E /* GameTheme.swift in Sources */,
 				A1000001000000000000000F /* LevelConfig.swift in Sources */,
 				A10000010000000000000010 /* LevelProgress.swift in Sources */,
+				A10000010000000000000013 /* RunSnapshot.swift in Sources */,
+				A10000010000000000000014 /* RewardedAdManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

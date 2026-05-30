@@ -22,6 +22,9 @@ enum GameConstants {
     static let victoryRunDuration: TimeInterval = 1.75
     static let victoryExitBeyondScreen: CGFloat = 60
     static let obstacleExitDuration: TimeInterval = 0.55
+    static let continueInvincibilityDuration: TimeInterval = 0.8
+    static let continueCountdownStepDuration: TimeInterval = 1.0
+    static let continueSpawnClearance: CGFloat = 140
 }
 
 enum GameHUDLayout {
