@@ -110,6 +110,7 @@ private struct LevelRow: View {
         .contentShape(RoundedRectangle(cornerRadius: 18))
         .onTapGesture {
             guard isUnlocked else { return }
+            UISounds.playButtonTap()
             onSelect()
         }
         .opacity(isUnlocked ? 1 : 0.55)

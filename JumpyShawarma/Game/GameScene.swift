@@ -1,3 +1,4 @@
+import AVFoundation
 import SpriteKit
 
 final class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -124,7 +125,15 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         hud.add(to: self)
 
         isSetup = true
+        primeAudioEngine()
         enterReadyState()
+    }
+
+    /// Starts the scene's audio engine up front so the first flap plays the
+    /// jump sound instantly instead of paying a cold-start freeze mid-tap.
+    private func primeAudioEngine() {
+        guard !audioEngine.isRunning else { return }
+        try? audioEngine.start()
     }
 
     // MARK: - State
@@ -305,8 +314,10 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
         switch hud.gameOverAction(at: location) {
         case .watchAd:
+            UISounds.playButtonTap()
             requestContinueWithAd()
         case .retry:
+            UISounds.playButtonTap()
             retryRun()
         case nil:
             break
@@ -319,8 +330,10 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
         switch hud.levelCompleteAction(at: location) {
         case .playAgain:
+            UISounds.playButtonTap()
             enterReadyState()
         case .next:
+            UISounds.playButtonTap()
             if let nextLevel = level.next {
                 onNextLevel?(nextLevel)
             }

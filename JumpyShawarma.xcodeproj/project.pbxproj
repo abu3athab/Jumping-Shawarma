@@ -29,6 +29,8 @@
 		A10000010000000000000014 /* RewardedAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000015 /* RewardedAdManager.swift */; };
 		A10000010000000000000015 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000016 /* LaunchScreen.storyboard */; };
 		F2F064CC2FCAE20600402546 /* jumpSound.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2F064CD2FCAE20600402547 /* jumpSound.caf */; };
+		F2F064D12FCAE2060040254B /* buttonTap.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2F064D22FCAE2060040254C /* buttonTap.caf */; };
+		F2F064D52FCAE2060040254F /* UISounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F064D62FCAE20600402550 /* UISounds.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +58,8 @@
 		A10000020000000000000016 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F2F064CB2FCAE20600402545 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F2F064CD2FCAE20600402547 /* jumpSound.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = jumpSound.caf; sourceTree = "<group>"; };
+		F2F064D22FCAE2060040254C /* buttonTap.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = buttonTap.caf; sourceTree = "<group>"; };
+		F2F064D62FCAE20600402550 /* UISounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISounds.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +134,7 @@
 				A10000020000000000000014 /* RunSnapshot.swift */,
 				A10000020000000000000006 /* PhysicsCategory.swift */,
 				A10000020000000000000007 /* GameState.swift */,
+				F2F064D62FCAE20600402550 /* UISounds.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -158,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				F2F064CD2FCAE20600402547 /* jumpSound.caf */,
+				F2F064D22FCAE2060040254C /* buttonTap.caf */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -232,6 +238,7 @@
 				A10000010000000000000003 /* Assets.xcassets in Resources */,
 				A10000010000000000000015 /* LaunchScreen.storyboard in Resources */,
 				F2F064CC2FCAE20600402546 /* jumpSound.caf in Resources */,
+				F2F064D12FCAE2060040254B /* buttonTap.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +256,7 @@
 				A10000010000000000000004 /* GameConstants.swift in Sources */,
 				A10000010000000000000005 /* PhysicsCategory.swift in Sources */,
 				A10000010000000000000006 /* GameState.swift in Sources */,
+				F2F064D52FCAE2060040254F /* UISounds.swift in Sources */,
 				A10000010000000000000007 /* BirdNode.swift in Sources */,
 				A10000010000000000000008 /* PipeNode.swift in Sources */,
 				A10000010000000000000009 /* ScoreManager.swift in Sources */,

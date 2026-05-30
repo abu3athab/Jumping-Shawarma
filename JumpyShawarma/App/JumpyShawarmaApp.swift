@@ -74,6 +74,9 @@ struct RootView: View {
                 .id(level)
             }
         }
+        .task(priority: .utility) {
+            UISounds.prepare()
+        }
     }
 }
 
@@ -116,7 +119,10 @@ struct GameContainerView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .topLeading) {
             if showsLevelsButton {
-                Button(action: onExit) {
+                Button(action: {
+                    UISounds.playButtonTap()
+                    onExit()
+                }) {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                         Text("Levels")
