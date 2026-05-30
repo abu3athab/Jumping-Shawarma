@@ -41,8 +41,7 @@ enum LevelConfig: Int, CaseIterable {
 
     var pipeWidth: CGFloat {
         switch self {
-        case .nightAlley, .downtownRush: return 74
-        case .rooftopShift: return 58
+        case .nightAlley, .downtownRush, .rooftopShift: return 74
         }
     }
 

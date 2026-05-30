@@ -198,13 +198,24 @@ final class PipeSpawner {
         let topHeight = size.height - (centerY + gapHeight / 2)
         let bottomHeight = centerY - gapHeight / 2
 
-        let stallVariant = level == .downtownRush ? Int.random(in: 0..<PipeNode.streetStallVariantCount) : 0
+        let pipeVariant: Int
+        switch level {
+        case .downtownRush:
+            pipeVariant = Int.random(in: 0..<PipeNode.streetStallVariantCount)
+        case .rooftopShift:
+            pipeVariant = Int.random(in: 0..<PipeNode.rooftopVariantCount)
+        default:
+            pipeVariant = 0
+        }
+
+        let pairLayoutHeight = max(topHeight, bottomHeight)
 
         let topPipe = PipeNode.makePipe(
             size: CGSize(width: pipeWidth, height: topHeight),
             isTop: true,
             theme: theme,
-            stallVariant: stallVariant
+            stallVariant: pipeVariant,
+            pairLayoutHeight: pairLayoutHeight
         )
         topPipe.position = CGPoint(x: size.width + pipeWidth, y: size.height - topHeight / 2)
         scene.addChild(topPipe)
@@ -213,7 +224,8 @@ final class PipeSpawner {
             size: CGSize(width: pipeWidth, height: bottomHeight),
             isTop: false,
             theme: theme,
-            stallVariant: stallVariant
+            stallVariant: pipeVariant,
+            pairLayoutHeight: pairLayoutHeight
         )
         bottomPipe.position = CGPoint(x: size.width + pipeWidth, y: bottomHeight / 2)
         scene.addChild(bottomPipe)

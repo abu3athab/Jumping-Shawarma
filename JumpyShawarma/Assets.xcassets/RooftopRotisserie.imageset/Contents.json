@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "rooftop-rotisserie.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
