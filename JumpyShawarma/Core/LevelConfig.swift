@@ -25,7 +25,7 @@ enum LevelConfig: Int, CaseIterable {
 
     var ordersRequired: Int {
         switch self {
-        case .nightAlley: return 2
+        case .nightAlley: return 30
         case .downtownRush: return 40
         case .rooftopShift: return 50
         }
@@ -41,8 +41,8 @@ enum LevelConfig: Int, CaseIterable {
 
     var pipeWidth: CGFloat {
         switch self {
-        case .nightAlley: return 74
-        case .downtownRush, .rooftopShift: return 58
+        case .nightAlley, .downtownRush: return 74
+        case .rooftopShift: return 58
         }
     }
 
