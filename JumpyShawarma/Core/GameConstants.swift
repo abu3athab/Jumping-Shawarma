@@ -17,7 +17,7 @@ enum GameConstants {
     static let maxBirdRotation: CGFloat = 0.9
     static let minBirdRotation: CGFloat = -0.45
 
-    static let bestScoreKey = "jumping_shawarma_best"
+    static let bestScoreKey = "jumpy_shawarma_best"
 
     static let victoryRunDuration: TimeInterval = 1.75
     static let victoryExitBeyondScreen: CGFloat = 60

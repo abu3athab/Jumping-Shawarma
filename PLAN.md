@@ -1,4 +1,4 @@
-# Jumping Shawarma — Game Plan
+# Jumpy Shawarma — Game Plan
 
 ## Concept
 An arcade game for iOS. The player taps to keep a **shawarma** flying through gaps between vertical obstacles (grill poles / pita walls). One mistake = game over.
@@ -31,7 +31,7 @@ ready → playing → gameOver → ready
 ## Milestones
 
 ### MVP (this project) ✅
-- [x] Jumping shawarma with physics
+- [x] Jumpy shawarma with physics
 - [x] Scrolling pipe obstacles
 - [x] Score + best score (UserDefaults)
 - [x] Game over + restart
@@ -55,7 +55,7 @@ ready → playing → gameOver → ready
 
 ## Architecture
 ```
-JumpingShawarmaApp.swift     → App entry, hosts SpriteView
+JumpyShawarmaApp.swift     → App entry, hosts SpriteView
 GameScene.swift            → All game logic (SpriteKit)
 Assets.xcassets            → App icon, accent color
 ```
@@ -68,10 +68,10 @@ Single-scene design keeps MVP simple. Split into `BirdNode`, `PipePairNode`, `Ga
 - [ ] Privacy policy URL (if ads/analytics)
 - [ ] Screenshots (6.7", 6.5", iPad if universal)
 - [ ] Age rating: 4+ (arcade)
-- [ ] Bundle ID: `com.ahmed.jumpingShawarma`
+- [ ] Bundle ID: `com.ahmed.jumpyShawarma`
 
 ## How to run
-1. Open `JumpingShawarma.xcodeproj` in Xcode.
+1. Open `JumpyShawarma.xcodeproj` in Xcode.
 2. Select an iPhone simulator.
 3. **Product → Run** (⌘R).
 4. Click/tap in the simulator to flap.

@@ -18,7 +18,7 @@ struct LevelSelectView: View {
 
             VStack(spacing: 24) {
                 VStack(spacing: 8) {
-                    Text("Jumping Shawarma")
+                    Text("Jumpy Shawarma")
                         .font(.custom("AvenirNext-Heavy", size: 32))
                         .foregroundStyle(DashboardTheme.cream)
 
@@ -120,7 +120,7 @@ private struct LevelRow: View {
             return "Completed · \(level.ordersRequired) orders"
         }
         if isUnlocked {
-            return "Serve \(level.ordersRequired) orders"
+            return level.featureSummary
         }
         if let previous = level.previous {
             return "Complete Level \(previous.id) to unlock"

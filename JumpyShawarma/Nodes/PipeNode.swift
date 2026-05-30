@@ -11,6 +11,8 @@ enum PipeNode {
             return makeGrillPipe(size: size, isTop: isTop, theme: theme)
         case .downtownRush:
             return makeDeliveryPipe(size: size, isTop: isTop, theme: theme)
+        case .rooftopShift:
+            return makeRooftopPipe(size: size, isTop: isTop, theme: theme)
         }
     }
 
@@ -90,6 +92,65 @@ enum PipeNode {
         cap.position = CGPoint(x: 0, y: capY)
         cap.zPosition = 3
         pipe.addChild(cap)
+
+        return pipe
+    }
+
+    private static func makeRooftopPipe(size: CGSize, isTop: Bool, theme: ThemePalette) -> SKSpriteNode {
+        let pipe = SKSpriteNode(color: .clear, size: size)
+        pipe.name = pipeName
+        pipe.zPosition = 3
+        attachPhysics(to: pipe, size: size)
+
+        let panelCount = max(2, Int(size.height / 48))
+        let panelHeight = size.height / CGFloat(panelCount)
+
+        for index in 0..<panelCount {
+            let y = -size.height / 2 + panelHeight / 2 + CGFloat(index) * panelHeight
+            let panel = SKShapeNode(rectOf: CGSize(width: size.width - 6, height: panelHeight - 5), cornerRadius: 5)
+            panel.fillColor = index.isMultiple(of: 2) ? theme.metalMid : theme.metalDark
+            panel.strokeColor = theme.metalLight.withAlphaComponent(0.4)
+            panel.lineWidth = 1.5
+            panel.position = CGPoint(x: 0, y: y)
+            panel.zPosition = 1
+            pipe.addChild(panel)
+
+            let ventSlot = SKShapeNode(rectOf: CGSize(width: size.width - 16, height: 4), cornerRadius: 2)
+            ventSlot.fillColor = theme.accentGlow
+            ventSlot.strokeColor = .clear
+            ventSlot.position = CGPoint(x: 0, y: y + panelHeight * 0.12)
+            ventSlot.zPosition = 2
+            if index == panelCount / 2 {
+                GameTheme.pulse(node: ventSlot, minAlpha: 0.35, maxAlpha: 0.85, duration: 0.7)
+            }
+            pipe.addChild(ventSlot)
+        }
+
+        let capY = isTop ? -size.height / 2 + 14 : size.height / 2 - 14
+        let cap = SKShapeNode(rectOf: CGSize(width: size.width + 6, height: 16), cornerRadius: 4)
+        cap.fillColor = theme.metalLight.withAlphaComponent(0.85)
+        cap.strokeColor = theme.accent.withAlphaComponent(0.7)
+        cap.lineWidth = 2
+        cap.position = CGPoint(x: 0, y: capY)
+        cap.zPosition = 3
+        pipe.addChild(cap)
+
+        if isTop {
+            let chain = SKShapeNode(rectOf: CGSize(width: 3, height: 18))
+            chain.fillColor = theme.metalLight
+            chain.strokeColor = .clear
+            chain.position = CGPoint(x: 0, y: capY - 20)
+            chain.zPosition = 4
+            pipe.addChild(chain)
+        } else {
+            let steam = SKShapeNode(circleOfRadius: 6)
+            steam.fillColor = GameTheme.steam
+            steam.strokeColor = .clear
+            steam.position = CGPoint(x: 0, y: capY + 16)
+            steam.zPosition = 4
+            GameTheme.pulse(node: steam, minAlpha: 0.15, maxAlpha: 0.45, duration: 1.0)
+            pipe.addChild(steam)
+        }
 
         return pipe
     }

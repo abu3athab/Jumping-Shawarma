@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10000010000000000000001 /* JumpingShawarmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000001 /* JumpingShawarmaApp.swift */; };
+		A10000010000000000000001 /* JumpyShawarmaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000001 /* JumpyShawarmaApp.swift */; };
 		A10000010000000000000002 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000002 /* GameScene.swift */; };
 		A10000010000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000003 /* Assets.xcassets */; };
 		A10000010000000000000004 /* GameConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000005 /* GameConstants.swift */; };
@@ -24,16 +24,17 @@
 		A1000001000000000000000F /* LevelConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000010 /* LevelConfig.swift */; };
 		A10000010000000000000010 /* LevelProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000011 /* LevelProgress.swift */; };
 		A10000010000000000000011 /* LevelSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000012 /* LevelSelectView.swift */; };
-        A10000010000000000000012 /* GameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013 /* GameSpriteView.swift */; };
+		A10000010000000000000012 /* GameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013 /* GameSpriteView.swift */; };
 		A10000010000000000000013 /* RunSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000014 /* RunSnapshot.swift */; };
 		A10000010000000000000014 /* RewardedAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000015 /* RewardedAdManager.swift */; };
+		A10000010000000000000015 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000016 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A10000020000000000000001 /* JumpingShawarmaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JumpingShawarmaApp.swift; sourceTree = "<group>"; };
+		A10000020000000000000001 /* JumpyShawarmaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JumpyShawarmaApp.swift; sourceTree = "<group>"; };
 		A10000020000000000000002 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		A10000020000000000000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A10000020000000000000004 /* JumpingShawarma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JumpingShawarma.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000020000000000000004 /* JumpyShawarma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JumpyShawarma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000020000000000000005 /* GameConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConstants.swift; sourceTree = "<group>"; };
 		A10000020000000000000006 /* PhysicsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsCategory.swift; sourceTree = "<group>"; };
 		A10000020000000000000007 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
@@ -51,6 +52,8 @@
 		A10000020000000000000013 /* GameSpriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSpriteView.swift; sourceTree = "<group>"; };
 		A10000020000000000000014 /* RunSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunSnapshot.swift; sourceTree = "<group>"; };
 		A10000020000000000000015 /* RewardedAdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardedAdManager.swift; sourceTree = "<group>"; };
+		A10000020000000000000016 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		F2F064CB2FCAE20600402545 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,14 +70,15 @@
 		A10000040000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				A10000040000000000000002 /* JumpingShawarma */,
+				A10000040000000000000002 /* JumpyShawarma */,
 				A10000040000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A10000040000000000000002 /* JumpingShawarma */ = {
+		A10000040000000000000002 /* JumpyShawarma */ = {
 			isa = PBXGroup;
 			children = (
+				F2F064CB2FCAE20600402545 /* Info.plist */,
 				A10000040000000000000004 /* App */,
 				A10000040000000000000005 /* Game */,
 				A10000040000000000000006 /* Core */,
@@ -82,14 +86,15 @@
 				A10000040000000000000008 /* Managers */,
 				A10000040000000000000009 /* Environment */,
 				A10000020000000000000003 /* Assets.xcassets */,
+				A10000020000000000000016 /* LaunchScreen.storyboard */,
 			);
-			path = JumpingShawarma;
+			path = JumpyShawarma;
 			sourceTree = "<group>";
 		};
 		A10000040000000000000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000020000000000000004 /* JumpingShawarma.app */,
+				A10000020000000000000004 /* JumpyShawarma.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -97,7 +102,7 @@
 		A10000040000000000000004 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				A10000020000000000000001 /* JumpingShawarmaApp.swift */,
+				A10000020000000000000001 /* JumpyShawarmaApp.swift */,
 				A10000020000000000000012 /* LevelSelectView.swift */,
 				A10000020000000000000013 /* GameSpriteView.swift */,
 			);
@@ -158,9 +163,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A10000050000000000000001 /* JumpingShawarma */ = {
+		A10000050000000000000001 /* JumpyShawarma */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000080000000000000003 /* Build configuration list for PBXNativeTarget "JumpingShawarma" */;
+			buildConfigurationList = A10000080000000000000003 /* Build configuration list for PBXNativeTarget "JumpyShawarma" */;
 			buildPhases = (
 				A10000060000000000000001 /* Sources */,
 				A10000030000000000000001 /* Frameworks */,
@@ -170,9 +175,9 @@
 			);
 			dependencies = (
 			);
-			name = JumpingShawarma;
-			productName = JumpingShawarma;
-			productReference = A10000020000000000000004 /* JumpingShawarma.app */;
+			name = JumpyShawarma;
+			productName = JumpyShawarma;
+			productReference = A10000020000000000000004 /* JumpyShawarma.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -190,7 +195,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A10000080000000000000001 /* Build configuration list for PBXProject "JumpingShawarma" */;
+			buildConfigurationList = A10000080000000000000001 /* Build configuration list for PBXProject "JumpyShawarma" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -203,7 +208,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A10000050000000000000001 /* JumpingShawarma */,
+				A10000050000000000000001 /* JumpyShawarma */,
 			);
 		};
 /* End PBXProject section */
@@ -214,6 +219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000010000000000000003 /* Assets.xcassets in Resources */,
+				A10000010000000000000015 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,7 +230,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000010000000000000001 /* JumpingShawarmaApp.swift in Sources */,
+				A10000010000000000000001 /* JumpyShawarmaApp.swift in Sources */,
 				A10000010000000000000011 /* LevelSelectView.swift in Sources */,
 				A10000010000000000000012 /* GameSpriteView.swift in Sources */,
 				A10000010000000000000002 /* GameScene.swift in Sources */,
@@ -349,17 +355,23 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JumpyShawarma/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Jumpy Shawarma";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahmed.jumpingShawarma;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahmed.jumpyShawarma;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -375,17 +387,23 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JumpyShawarma/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Jumpy Shawarma";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahmed.jumpingShawarma;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahmed.jumpyShawarma;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -395,7 +413,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A10000080000000000000001 /* Build configuration list for PBXProject "JumpingShawarma" */ = {
+		A10000080000000000000001 /* Build configuration list for PBXProject "JumpyShawarma" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A100000A0000000000000001 /* Debug */,
@@ -404,7 +422,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A10000080000000000000003 /* Build configuration list for PBXNativeTarget "JumpingShawarma" */ = {
+		A10000080000000000000003 /* Build configuration list for PBXNativeTarget "JumpyShawarma" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A100000A0000000000000003 /* Debug */,
