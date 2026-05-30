@@ -63,6 +63,10 @@ private extension ThemePalette {
     var swiftUIBackground: Color {
         Color(uiColor: background)
     }
+
+    var swiftUIAccent: Color {
+        Color(uiColor: accent)
+    }
 }
 
 struct GameContainerView: View {
@@ -98,10 +102,14 @@ struct GameContainerView: View {
                         Text("Levels")
                     }
                     .font(.custom("AvenirNext-DemiBold", size: 15))
-                    .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.35))
+                    .foregroundStyle(level.theme.swiftUIAccent)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(Color.black.opacity(0.35), in: Capsule())
+                    .background(level.theme.swiftUIAccent.opacity(0.18), in: Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(level.theme.swiftUIAccent.opacity(0.55), lineWidth: 1.5)
+                    )
                 }
                 .padding(.leading, 16)
                 .padding(

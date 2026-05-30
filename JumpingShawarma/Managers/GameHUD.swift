@@ -126,7 +126,6 @@ final class GameHUD {
 
         GameTheme.attachShadow(to: scoreLabel)
         GameTheme.attachShadow(to: messageLabel)
-        GameTheme.attachShadow(to: subMessageLabel)
         GameTheme.attachShadow(to: completeTitleLabel)
         GameTheme.attachShadow(to: completeMessageLabel)
         GameTheme.attachShadow(to: completeSubLabel)
@@ -196,7 +195,6 @@ final class GameHUD {
         messageLabel.text = level.name
         subMessageLabel.text = "Serve \(level.ordersRequired) orders · Tap to start"
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 0.55
     }
 
@@ -205,7 +203,6 @@ final class GameHUD {
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 1.0
         updateScore(0, goal: level.ordersRequired)
     }
@@ -213,9 +210,8 @@ final class GameHUD {
     func showGameOver(score: Int, goal: Int, best: Int) {
         hideLevelComplete()
         messageLabel.text = "Shawarma dropped!"
-        subMessageLabel.text = "Orders \(score)/\(goal) · Best \(best)\nTap to try again"
+        subMessageLabel.text = "Orders \(score)/\(goal) · Best \(best) · Tap to try again"
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 0.75
     }
 
@@ -223,7 +219,6 @@ final class GameHUD {
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
-        GameTheme.syncShadow(on: subMessageLabel)
         scoreBadge.alpha = 1.0
         updateScore(level.ordersRequired, goal: level.ordersRequired)
 
