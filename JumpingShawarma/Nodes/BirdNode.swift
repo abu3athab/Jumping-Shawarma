@@ -40,6 +40,18 @@ enum BirdNode {
         bird.zRotation = bird.zRotation * 0.85 + tilt * 0.15
     }
 
+    static func resume(_ bird: SKNode, at position: CGPoint) {
+        bird.removeAllActions()
+        bird.physicsBody?.velocity = .zero
+        bird.position = position
+        bird.zRotation = 0
+        bird.zPosition = 15
+        bird.setScale(1.0)
+        restoreCollisions(bird)
+        startFlying(bird)
+        flap(bird)
+    }
+
     static func reset(_ bird: SKNode, in sceneSize: CGSize) {
         bird.physicsBody?.isDynamic = false
         bird.physicsBody?.velocity = .zero
@@ -49,6 +61,7 @@ enum BirdNode {
             y: sceneSize.height * GameConstants.birdStartYRatio
         )
         bird.zRotation = 0
+        bird.zPosition = 10
         bird.setScale(1.0)
         restoreCollisions(bird)
     }

@@ -18,6 +18,10 @@ final class ScoreManager {
         return current
     }
 
+    func restoreCurrent(_ score: Int) {
+        current = score
+    }
+
     func saveBestIfNeeded() {
         if current > best {
             best = current

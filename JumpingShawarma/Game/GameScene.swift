@@ -11,9 +11,14 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     private let pipeSpawner = PipeSpawner()
     private var hud: GameHUD!
     private var safeAreaTop: CGFloat = 0
+    private var continueSnapshot: RunSnapshot?
+    private var hasUsedContinue = false
+    private var isInvincible = false
+    private var lastUpdateTime: TimeInterval = 0
 
     var onNextLevel: ((LevelConfig) -> Void)?
     var onStateChange: ((GameState) -> Void)?
+    var onWatchAdToContinue: ((@escaping (Bool) -> Void) -> Void)?
 
     init(size: CGSize, level: LevelConfig) {
         self.level = level
@@ -42,19 +47,56 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
         GroundBuilder.reposition(ground, sceneWidth: size.width)
         hud.layout(for: size, safeAreaTop: safeAreaTop)
-        if state == .ready {
+
+        switch state {
+        case .ready:
             BirdNode.reset(bird, in: size)
+        case .playing, .gameOver, .continueCountdown:
+            if oldSize.width > 0, oldSize.height > 0, oldSize != size {
+                reflowWorldPositions(from: oldSize, to: size)
+            }
+        default:
+            break
         }
     }
 
     func applySafeArea(top: CGFloat) {
         safeAreaTop = top
         guard isSetup else { return }
+        guard state == .ready else {
+            hud.layout(for: size, safeAreaTop: top)
+            return
+        }
         GroundBuilder.reposition(ground, sceneWidth: size.width)
         hud.layout(for: size, safeAreaTop: top)
-        if state == .ready {
-            BirdNode.reset(bird, in: size)
-        }
+        BirdNode.reset(bird, in: size)
+    }
+
+    private func reflowWorldPositions(from oldSize: CGSize, to newSize: CGSize) {
+        guard oldSize.width > 0, oldSize.height > 0 else { return }
+
+        let scaleX = newSize.width / oldSize.width
+        let scaleY = newSize.height / oldSize.height
+
+        bird.position = CGPoint(
+            x: bird.position.x * scaleX,
+            y: bird.position.y * scaleY
+        )
+        pipeSpawner.scaleObstaclePositions(in: self, scaleX: scaleX, scaleY: scaleY)
+        GroundBuilder.reposition(ground, sceneWidth: newSize.width)
+    }
+
+    private func scaledPoint(_ point: CGPoint, from oldSize: CGSize, to newSize: CGSize) -> CGPoint {
+        CGPoint(
+            x: point.x * newSize.width / oldSize.width,
+            y: point.y * newSize.height / oldSize.height
+        )
+    }
+
+    private func clearContinueInvincibility() {
+        removeAction(forKey: "continueInvincibility")
+        isInvincible = false
+        BirdNode.restoreCollisions(bird)
     }
 
     private func configureIfNeeded() {
@@ -85,12 +127,19 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     private func enterReadyState() {
         state = .ready
         onStateChange?(.ready)
+        clearContinueInvincibility()
+        continueSnapshot = nil
+        hasUsedContinue = false
         BirdNode.reset(bird, in: size)
         bird.isHidden = false
         scoreManager.reset()
         pipeSpawner.removeAll(from: self)
         pipeSpawner.resetTimer()
         hud.showReady(level: level)
+    }
+
+    private func retryRun() {
+        enterReadyState()
     }
 
     private func startGame() {
@@ -105,6 +154,14 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     private func endGame() {
         guard state.isPlaying else { return }
 
+        continueSnapshot = RunSnapshot(
+            score: scoreManager.current,
+            birdPosition: bird.position,
+            birdRotation: bird.zRotation,
+            lastSpawnTime: pipeSpawner.spawnTime,
+            sceneSize: size
+        )
+
         state = .gameOver
         onStateChange?(.gameOver)
         BirdNode.stop(bird)
@@ -113,8 +170,70 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         hud.showGameOver(
             score: scoreManager.current,
             goal: level.ordersRequired,
-            best: scoreManager.best
+            best: scoreManager.best,
+            canContinue: !hasUsedContinue
         )
+    }
+
+    private func beginContinueAfterAd() {
+        guard state == .gameOver, continueSnapshot != nil else { return }
+
+        if continueSnapshot?.sceneSize != size {
+            reflowWorldPositions(from: continueSnapshot!.sceneSize, to: size)
+        }
+
+        let safePosition = pipeSpawner.prepareContinue(in: self)
+        bird.position = safePosition
+        bird.zRotation = 0
+        bird.zPosition = 15
+        BirdNode.stop(bird)
+
+        state = .continueCountdown
+        onStateChange?(.continueCountdown)
+
+        hud.showContinueCountdown { [weak self] in
+            self?.resumeAfterContinue()
+        }
+    }
+
+    func resumeAfterContinue() {
+        guard let snapshot = continueSnapshot else { return }
+        guard state == .continueCountdown else { return }
+
+        clearContinueInvincibility()
+
+        if snapshot.sceneSize != size {
+            reflowWorldPositions(from: snapshot.sceneSize, to: size)
+        }
+
+        state = .playing
+        onStateChange?(.playing)
+        hasUsedContinue = true
+        isInvincible = true
+
+        scoreManager.restoreCurrent(snapshot.score)
+        BirdNode.resume(bird, at: bird.position)
+        pipeSpawner.scheduleNextSpawn(after: 1.4, from: lastUpdateTime)
+        pipeSpawner.resumeScroll(in: self)
+
+        hud.showPlaying(score: snapshot.score, goal: level.ordersRequired)
+        continueSnapshot = nil
+
+        run(.sequence([
+            .wait(forDuration: GameConstants.continueInvincibilityDuration),
+            .run { [weak self] in
+                self?.clearContinueInvincibility()
+            },
+        ]), withKey: "continueInvincibility")
+    }
+
+    private func requestContinueWithAd() {
+        guard continueSnapshot != nil, !hasUsedContinue else { return }
+
+        onWatchAdToContinue? { [weak self] rewarded in
+            guard let self, rewarded else { return }
+            self.beginContinueAfterAd()
+        }
     }
 
     private func beginVictorySequence() {
@@ -145,12 +264,13 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     // MARK: - Loop
 
     override func update(_ currentTime: TimeInterval) {
+        lastUpdateTime = currentTime
         guard state.isPlaying else { return }
 
         pipeSpawner.update(currentTime: currentTime, scene: self)
         BirdNode.updateRotation(bird)
 
-        if bird.position.y > size.height + 40 || bird.position.y < -40 {
+        if !isInvincible && (bird.position.y > size.height + 40 || bird.position.y < -40) {
             endGame()
         }
     }
@@ -166,9 +286,25 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         case .victoryRun:
             break
         case .gameOver:
-            enterReadyState()
+            handleGameOverTap(touches)
+        case .continueCountdown:
+            break
         case .levelComplete:
             handleLevelCompleteTap(touches)
+        }
+    }
+
+    private func handleGameOverTap(_ touches: Set<UITouch>) {
+        guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
+
+        switch hud.gameOverAction(at: location) {
+        case .watchAd:
+            requestContinueWithAd()
+        case .retry:
+            retryRun()
+        case nil:
+            break
         }
     }
 
@@ -201,6 +337,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         }
 
         if masks & PhysicsCategory.pipe != 0 || masks & PhysicsCategory.ground != 0 {
+            guard !isInvincible else { return }
             endGame()
         }
     }

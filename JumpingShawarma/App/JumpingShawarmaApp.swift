@@ -3,6 +3,8 @@ import SpriteKit
 
 @main
 struct JumpingShawarmaApp: App {
+    @StateObject private var rewardedAdManager = RewardedAdManager()
+
     init() {
         UIWindow.appearance().backgroundColor = UIColor(red: 0.42, green: 0.2, blue: 0.16, alpha: 1)
     }
@@ -11,6 +13,7 @@ struct JumpingShawarmaApp: App {
         WindowGroup {
             RootView()
                 .background(AppColors.dashboard.ignoresSafeArea())
+                .environmentObject(rewardedAdManager)
         }
     }
 }
@@ -74,9 +77,11 @@ struct GameContainerView: View {
     let onExit: () -> Void
     let onNextLevel: (LevelConfig) -> Void
 
+    @EnvironmentObject private var rewardedAdManager: RewardedAdManager
     @State private var scene: GameScene
     @State private var showsLevelsButton = true
     @State private var safeAreaTop: CGFloat = 0
+    @State private var freezesSceneLayout = false
 
     init(level: LevelConfig, onExit: @escaping () -> Void, onNextLevel: @escaping (LevelConfig) -> Void) {
         self.level = level
@@ -137,17 +142,27 @@ struct GameContainerView: View {
         }
         .onAppear {
             scene.onNextLevel = onNextLevel
+            scene.onWatchAdToContinue = { completion in
+                rewardedAdManager.showRewardedAd(completion: completion)
+            }
             scene.onStateChange = { state in
+                freezesSceneLayout = state == .gameOver || state == .continueCountdown
                 showsLevelsButton = state == .ready
                     || state == .gameOver
                     || state == .levelComplete
             }
             showsLevelsButton = true
         }
+        .fullScreenCover(isPresented: $rewardedAdManager.isShowingAd) {
+            SimulatedRewardedAdView { granted in
+                rewardedAdManager.finishRewardedAd(granted: granted)
+            }
+        }
     }
 
     private func updateSceneLayout(size: CGSize, safeAreaTop: CGFloat) {
         guard size.width > 0, size.height > 0 else { return }
+        guard !freezesSceneLayout else { return }
         self.safeAreaTop = safeAreaTop
         scene.size = size
         scene.applySafeArea(top: safeAreaTop)
