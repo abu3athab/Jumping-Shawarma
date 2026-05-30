@@ -59,26 +59,45 @@ enum PipeNode {
         case .downtownRush:
             let index = ((stallVariant % stallTowerTextures.count) + stallTowerTextures.count)
                 % stallTowerTextures.count
-            return makeStallTowerPipe(size: size, texture: stallTowerTextures[index])
+            return makeStallTowerPipe(size: size, isTop: isTop, texture: stallTowerTextures[index])
         case .rooftopShift:
             return makeRooftopPipe(size: size, isTop: isTop, theme: theme)
         }
     }
 
-    private static func makeStallTowerPipe(size: CGSize, texture: SKTexture) -> SKSpriteNode {
+    private static func makeStallTowerPipe(size: CGSize, isTop: Bool, texture: SKTexture) -> SKSpriteNode {
         let pipe = SKSpriteNode(color: .clear, size: size)
         pipe.name = pipeName
         pipe.zPosition = 3
-        attachPhysics(to: pipe, size: size)
 
         let crop = SKCropNode()
         crop.zPosition = 1
         crop.maskNode = SKSpriteNode(color: .white, size: size)
         pipe.addChild(crop)
 
-        let tower = SKSpriteNode(texture: texture, size: size)
+        let textureSize = texture.size()
+        guard textureSize.width > 0, textureSize.height > 0 else {
+            attachRectPhysics(to: pipe, size: size)
+            return pipe
+        }
+
+        let fillScale = max(size.width / textureSize.width, size.height / textureSize.height)
+        let displaySize = CGSize(
+            width: textureSize.width * fillScale,
+            height: textureSize.height * fillScale
+        )
+
+        let tower = SKSpriteNode(texture: texture, size: displaySize)
         tower.zPosition = 1
+
+        if isTop {
+            tower.position = CGPoint(x: 0, y: -size.height / 2 + displaySize.height / 2)
+        } else {
+            tower.position = CGPoint(x: 0, y: size.height / 2 - displaySize.height / 2)
+        }
+
         crop.addChild(tower)
+        addTextureCollider(to: pipe, texture: texture, size: displaySize, position: tower.position)
 
         return pipe
     }
@@ -87,7 +106,6 @@ enum PipeNode {
         let pipe = SKSpriteNode(color: .clear, size: size)
         pipe.name = pipeName
         pipe.zPosition = 3
-        attachPhysics(to: pipe, size: size)
 
         let capTexture = isTop ? assets.capTop : assets.capBottom
         let pipeWidth = size.width
@@ -113,18 +131,32 @@ enum PipeNode {
         if isTop {
             cap.position = CGPoint(x: 0, y: -size.height / 2 + capHeight / 2)
             crop.addChild(cap)
+            addTextureCollider(to: pipe, texture: capTexture, size: cap.size, position: cap.position)
 
             if bodyHeight > 0 {
                 let bodyCenterY = -size.height / 2 + capHeight + bodyHeight / 2
                 addTiledBody(to: crop, texture: assets.body, width: pipeWidth, height: bodyHeight, centerY: bodyCenterY)
+                addTextureCollider(
+                    to: pipe,
+                    texture: assets.body,
+                    size: CGSize(width: pipeWidth, height: bodyHeight),
+                    position: CGPoint(x: 0, y: bodyCenterY)
+                )
             }
         } else {
             cap.position = CGPoint(x: 0, y: size.height / 2 - capHeight / 2)
             crop.addChild(cap)
+            addTextureCollider(to: pipe, texture: capTexture, size: cap.size, position: cap.position)
 
             if bodyHeight > 0 {
                 let bodyCenterY = size.height / 2 - capHeight - bodyHeight / 2
                 addTiledBody(to: crop, texture: assets.body, width: pipeWidth, height: bodyHeight, centerY: bodyCenterY)
+                addTextureCollider(
+                    to: pipe,
+                    texture: assets.body,
+                    size: CGSize(width: pipeWidth, height: bodyHeight),
+                    position: CGPoint(x: 0, y: bodyCenterY)
+                )
             }
         }
 
@@ -181,7 +213,7 @@ enum PipeNode {
         let pipe = SKSpriteNode(color: .clear, size: size)
         pipe.name = pipeName
         pipe.zPosition = 3
-        attachPhysics(to: pipe, size: size)
+        attachRectPhysics(to: pipe, size: size)
 
         let panelCount = max(2, Int(size.height / 48))
         let panelHeight = size.height / CGFloat(panelCount)
@@ -236,11 +268,30 @@ enum PipeNode {
         return pipe
     }
 
-    private static func attachPhysics(to pipe: SKSpriteNode, size: CGSize) {
-        pipe.physicsBody = SKPhysicsBody(rectangleOf: size)
-        pipe.physicsBody?.isDynamic = false
-        pipe.physicsBody?.categoryBitMask = PhysicsCategory.pipe
-        pipe.physicsBody?.contactTestBitMask = PhysicsCategory.bird
+    private static func attachRectPhysics(to pipe: SKSpriteNode, size: CGSize) {
+        let body = SKPhysicsBody(rectangleOf: size)
+        configurePipePhysics(body)
+        pipe.physicsBody = body
+    }
+
+    private static func addTextureCollider(
+        to pipe: SKNode,
+        texture: SKTexture,
+        size: CGSize,
+        position: CGPoint
+    ) {
+        let collider = SKNode()
+        collider.position = position
+        let body = SKPhysicsBody(texture: texture, size: size)
+        configurePipePhysics(body)
+        collider.physicsBody = body
+        pipe.addChild(collider)
+    }
+
+    private static func configurePipePhysics(_ body: SKPhysicsBody) {
+        body.isDynamic = false
+        body.categoryBitMask = PhysicsCategory.pipe
+        body.contactTestBitMask = PhysicsCategory.bird
     }
 
     static func makeScoreZone(at position: CGPoint, gapHeight: CGFloat) -> SKNode {
