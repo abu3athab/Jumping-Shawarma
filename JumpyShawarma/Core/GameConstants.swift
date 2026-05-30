@@ -19,8 +19,15 @@ enum GameConstants {
 
     static let bestScoreKey = "jumpy_shawarma_best"
 
-    static let victoryRunDuration: TimeInterval = 1.75
+    static let victoryRunDuration: TimeInterval = 1.35
+    static let victorySwallowDuration: TimeInterval = 0.32
+    static let victoryCustomerEnterDuration: TimeInterval = 0.55
     static let victoryExitBeyondScreen: CGFloat = 60
+    static let victoryCustomerHeightRatio: CGFloat = 0.58
+    static let victoryCustomerCenterYRatio: CGFloat = 0.50
+    static let victoryCustomerInsetRatio: CGFloat = 0.16
+    static let victoryMouthOffsetXRatio: CGFloat = 0.30
+    static let victoryMouthOffsetYRatio: CGFloat = 0.035
     static let obstacleExitDuration: TimeInterval = 0.55
     static let continueInvincibilityDuration: TimeInterval = 0.8
     static let continueCountdownStepDuration: TimeInterval = 1.0

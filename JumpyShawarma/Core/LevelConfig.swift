@@ -25,7 +25,7 @@ enum LevelConfig: Int, CaseIterable {
 
     var ordersRequired: Int {
         switch self {
-        case .nightAlley: return 30
+        case .nightAlley: return 2
         case .downtownRush: return 40
         case .rooftopShift: return 50
         }

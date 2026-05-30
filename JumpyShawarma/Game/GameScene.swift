@@ -27,7 +27,6 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         self.level = level
         super.init(size: size)
         backgroundColor = level.theme.background
-        configureIfNeeded()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -37,7 +36,9 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMove(to view: SKView) {
         physicsWorld.gravity = CGVector(dx: 0, dy: GameConstants.gravity)
         physicsWorld.contactDelegate = self
-        configureIfNeeded()
+        DispatchQueue.main.async { [weak self] in
+            self?.configureIfNeeded()
+        }
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
@@ -119,8 +120,6 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
             y: size.height * GameConstants.birdStartYRatio
         ))
         addChild(bird)
-        BirdNode.preloadSounds()
-        PipeNode.preloadTextures()
 
         pipeSpawner.theme = level.theme
         pipeSpawner.level = level
@@ -150,6 +149,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         hasUsedContinue = false
         BirdNode.reset(bird, in: size)
         bird.isHidden = false
+        BirdNode.removeHungryCustomer(from: self)
         scoreManager.reset()
         pipeSpawner.removeAll(from: self)
         pipeSpawner.resetTimer()
@@ -264,7 +264,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         pipeSpawner.exitRemainingObstacles(in: self)
         BirdNode.disableCollisions(bird)
 
-        BirdNode.playVictoryExit(bird, in: size) { [weak self] in
+        BirdNode.playVictoryExit(bird, in: self) { [weak self] in
             self?.completeLevel()
         }
     }
@@ -275,6 +275,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         state = .levelComplete
         onStateChange?(.levelComplete)
         pipeSpawner.removeAll(from: self)
+        BirdNode.removeHungryCustomer(from: self)
         scoreManager.saveBestIfNeeded()
         LevelProgress.markCompleted(level)
         hud.showLevelComplete(level: level)

@@ -74,8 +74,8 @@ struct RootView: View {
                 .id(level)
             }
         }
-        .task(priority: .utility) {
-            UISounds.prepare()
+        .task {
+            GameAssetLoader.preloadIfNeeded()
         }
     }
 }
@@ -96,16 +96,17 @@ struct GameContainerView: View {
     let onNextLevel: (LevelConfig) -> Void
 
     @EnvironmentObject private var rewardedAdManager: RewardedAdManager
-    @State private var scene: GameScene
+    @State private var scene: GameScene?
     @State private var showsLevelsButton = true
     @State private var safeAreaTop: CGFloat = 0
     @State private var freezesSceneLayout = false
+
+    private let fallbackSceneHeight: CGFloat = 852
 
     init(level: LevelConfig, onExit: @escaping () -> Void, onNextLevel: @escaping (LevelConfig) -> Void) {
         self.level = level
         self.onExit = onExit
         self.onNextLevel = onNextLevel
-        _scene = State(initialValue: GameScene(size: CGSize(width: 393, height: 852), level: level))
     }
 
     var body: some View {
@@ -113,8 +114,10 @@ struct GameContainerView: View {
             level.theme.swiftUIBackground
                 .ignoresSafeArea()
 
-            GameSpriteView(scene: scene, backgroundColor: level.theme.background)
-                .ignoresSafeArea()
+            if let scene {
+                GameSpriteView(scene: scene, backgroundColor: level.theme.background)
+                    .ignoresSafeArea()
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .topLeading) {
@@ -141,7 +144,7 @@ struct GameContainerView: View {
                 .padding(
                     .top,
                     GameHUDLayout.scoreBadgeTopFromScreenTop(
-                        sceneHeight: scene.size.height,
+                        sceneHeight: scene?.size.height ?? fallbackSceneHeight,
                         safeAreaTop: safeAreaTop
                     )
                 )
@@ -161,18 +164,11 @@ struct GameContainerView: View {
                     }
             }
         }
-        .onAppear {
-            scene.onNextLevel = onNextLevel
-            scene.onWatchAdToContinue = { completion in
-                rewardedAdManager.showRewardedAd(completion: completion)
-            }
-            scene.onStateChange = { state in
-                freezesSceneLayout = state == .gameOver || state == .continueCountdown
-                showsLevelsButton = state == .ready
-                    || state == .gameOver
-                    || state == .levelComplete
-            }
-            showsLevelsButton = true
+        .task(id: level.id) {
+            GameAssetLoader.preloadIfNeeded()
+            let newScene = GameScene(size: CGSize(width: 393, height: fallbackSceneHeight), level: level)
+            wireScene(newScene)
+            scene = newScene
         }
         .fullScreenCover(isPresented: $rewardedAdManager.isShowingAd) {
             SimulatedRewardedAdView { granted in
@@ -181,7 +177,22 @@ struct GameContainerView: View {
         }
     }
 
+    private func wireScene(_ scene: GameScene) {
+        scene.onNextLevel = onNextLevel
+        scene.onWatchAdToContinue = { completion in
+            rewardedAdManager.showRewardedAd(completion: completion)
+        }
+        scene.onStateChange = { state in
+            freezesSceneLayout = state == .gameOver || state == .continueCountdown
+            showsLevelsButton = state == .ready
+                || state == .gameOver
+                || state == .levelComplete
+        }
+        showsLevelsButton = true
+    }
+
     private func updateSceneLayout(size: CGSize, safeAreaTop: CGFloat) {
+        guard let scene else { return }
         guard size.width > 0, size.height > 0 else { return }
         guard !freezesSceneLayout else { return }
         self.safeAreaTop = safeAreaTop
