@@ -366,6 +366,12 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         if masks & PhysicsCategory.pipe != 0 || masks & PhysicsCategory.ground != 0 {
             guard !isInvincible else { return }
             endGame()
+            return
+        }
+
+        if masks & PhysicsCategory.fire != 0 {
+            guard !isInvincible else { return }
+            endGame()
         }
     }
 

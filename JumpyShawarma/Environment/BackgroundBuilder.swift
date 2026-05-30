@@ -21,6 +21,9 @@ enum BackgroundBuilder {
         case .rooftopShift:
             addRooftopSilhouettes(to: scene, theme: theme)
             addSunsetGlow(to: scene, theme: theme)
+        case .forgeFlames:
+            addForgeSilhouettes(to: scene, theme: theme)
+            addForgeGlow(to: scene, theme: theme)
         }
     }
 
@@ -286,5 +289,86 @@ enum BackgroundBuilder {
         sun.zPosition = -22
         GameTheme.pulse(node: sun, minAlpha: 0.55, maxAlpha: 0.95, duration: 1.6)
         scene.addChild(sun)
+    }
+
+    private static func addForgeSilhouettes(to scene: SKScene, theme: ThemePalette) {
+        let width = scene.size.width
+        let groundTop = GameConstants.groundHeight + 24
+
+        let furnaces: [(xRatio: CGFloat, widthRatio: CGFloat, height: CGFloat)] = [
+            (0.04, 0.24, 96),
+            (0.32, 0.2, 78),
+            (0.56, 0.26, 108),
+            (0.82, 0.18, 86),
+        ]
+
+        for furnace in furnaces {
+            let furnaceWidth = width * furnace.widthRatio
+            let body = SKShapeNode(rectOf: CGSize(width: furnaceWidth, height: furnace.height), cornerRadius: 4)
+            body.fillColor = theme.silhouette
+            body.strokeColor = theme.metalLight.withAlphaComponent(0.18)
+            body.lineWidth = 1
+            body.position = CGPoint(
+                x: width * furnace.xRatio + furnaceWidth / 2,
+                y: groundTop + furnace.height / 2
+            )
+            body.zPosition = -20
+            scene.addChild(body)
+
+            let chimney = SKShapeNode(rectOf: CGSize(width: furnaceWidth * 0.18, height: 36), cornerRadius: 3)
+            chimney.fillColor = theme.metalMid.withAlphaComponent(0.9)
+            chimney.strokeColor = theme.metalLight.withAlphaComponent(0.2)
+            chimney.lineWidth = 1
+            chimney.position = CGPoint(x: furnaceWidth * 0.22, y: furnace.height / 2 + 24)
+            chimney.zPosition = 1
+            body.addChild(chimney)
+
+            let vent = SKShapeNode(rectOf: CGSize(width: furnaceWidth * 0.42, height: 14), cornerRadius: 3)
+            vent.fillColor = theme.accentGlow
+            vent.strokeColor = theme.accent.withAlphaComponent(0.45)
+            vent.lineWidth = 1
+            vent.position = CGPoint(x: 0, y: -furnace.height * 0.18)
+            vent.zPosition = 2
+            GameTheme.pulse(node: vent, minAlpha: 0.35, maxAlpha: 0.95, duration: 0.85)
+            body.addChild(vent)
+        }
+
+        let emberSpots: [(xRatio: CGFloat, radius: CGFloat)] = [
+            (0.2, 5),
+            (0.44, 4),
+            (0.68, 6),
+            (0.88, 4),
+        ]
+
+        for spot in emberSpots {
+            let ember = SKShapeNode(circleOfRadius: spot.radius)
+            ember.fillColor = theme.accentSecondary
+            ember.strokeColor = .clear
+            ember.position = CGPoint(x: width * spot.xRatio, y: groundTop + 42)
+            ember.zPosition = -17
+            GameTheme.pulse(node: ember, minAlpha: 0.4, maxAlpha: 1.0, duration: 0.6 + Double(spot.radius) * 0.05)
+            scene.addChild(ember)
+        }
+    }
+
+    private static func addForgeGlow(to scene: SKScene, theme: ThemePalette) {
+        let width = scene.size.width
+        let height = scene.size.height
+
+        let heat = SKShapeNode(rectOf: CGSize(width: width + 40, height: height * 0.38))
+        heat.fillColor = theme.accentGlow.withAlphaComponent(0.14)
+        heat.strokeColor = .clear
+        heat.position = CGPoint(x: width / 2, y: height * 0.18)
+        heat.zPosition = -25
+        scene.addChild(heat)
+
+        let flare = SKShapeNode(circleOfRadius: 48)
+        flare.fillColor = theme.accent.withAlphaComponent(0.16)
+        flare.strokeColor = theme.accentSecondary.withAlphaComponent(0.3)
+        flare.lineWidth = 2
+        flare.position = CGPoint(x: width * 0.22, y: height * 0.62)
+        flare.zPosition = -22
+        GameTheme.pulse(node: flare, minAlpha: 0.5, maxAlpha: 0.95, duration: 1.1)
+        scene.addChild(flare)
     }
 }

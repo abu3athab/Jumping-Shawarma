@@ -27,6 +27,7 @@ final class PipeSpawner {
         enumerateObstacles(in: scene) { node in
             node.removeAllActions()
         }
+        FireHazard.stopAll(in: scene)
     }
 
     var spawnTime: TimeInterval {
@@ -163,6 +164,7 @@ final class PipeSpawner {
         enumerateObstacles(in: scene) { node in
             node.removeFromParent()
         }
+        FireHazard.removeAll(from: scene)
     }
 
     func exitRemainingObstacles(in scene: SKScene) {
@@ -173,6 +175,14 @@ final class PipeSpawner {
                     SKAction.moveBy(x: -scene.size.width - 80, y: 0, duration: GameConstants.obstacleExitDuration),
                     SKAction.fadeOut(withDuration: GameConstants.obstacleExitDuration),
                 ]),
+                SKAction.removeFromParent(),
+            ]))
+        }
+        FireHazard.stopAll(in: scene)
+        scene.enumerateChildNodes(withName: FireHazard.fireballName) { node, _ in
+            node.removeAllActions()
+            node.run(.sequence([
+                SKAction.fadeOut(withDuration: GameConstants.obstacleExitDuration * 0.5),
                 SKAction.removeFromParent(),
             ]))
         }
@@ -198,37 +208,26 @@ final class PipeSpawner {
         let topHeight = size.height - (centerY + gapHeight / 2)
         let bottomHeight = centerY - gapHeight / 2
 
-        let pipeVariant: Int
-        switch level {
-        case .downtownRush:
-            pipeVariant = Int.random(in: 0..<PipeNode.streetStallVariantCount)
-        case .rooftopShift:
-            pipeVariant = Int.random(in: 0..<PipeNode.rooftopVariantCount)
-        default:
-            pipeVariant = 0
-        }
-
-        let pairLayoutHeight = max(topHeight, bottomHeight)
-
         let topPipe = PipeNode.makePipe(
             size: CGSize(width: pipeWidth, height: topHeight),
-            isTop: true,
-            theme: theme,
-            stallVariant: pipeVariant,
-            pairLayoutHeight: pairLayoutHeight
+            isTop: true
         )
         topPipe.position = CGPoint(x: size.width + pipeWidth, y: size.height - topHeight / 2)
         scene.addChild(topPipe)
 
         let bottomPipe = PipeNode.makePipe(
             size: CGSize(width: pipeWidth, height: bottomHeight),
-            isTop: false,
-            theme: theme,
-            stallVariant: pipeVariant,
-            pairLayoutHeight: pairLayoutHeight
+            isTop: false
         )
         bottomPipe.position = CGPoint(x: size.width + pipeWidth, y: bottomHeight / 2)
         scene.addChild(bottomPipe)
+
+        FireHazard.attachShootersIfNeeded(
+            to: topPipe,
+            bottomPipe: bottomPipe,
+            theme: theme,
+            enabled: level.hasFireShooters
+        )
 
         let scoreZone = PipeNode.makeScoreZone(
             at: CGPoint(x: size.width + pipeWidth + 10, y: centerY),

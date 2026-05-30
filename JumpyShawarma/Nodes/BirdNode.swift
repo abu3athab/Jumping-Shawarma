@@ -1,6 +1,7 @@
 import SpriteKit
 
 enum BirdNode {
+    static let playerName = "player"
     static let hungryCustomerName = "hungryCustomer"
     private static let spriteName = "sprite"
     private static let playerSize = CGSize(width: 78, height: 78)
@@ -27,6 +28,7 @@ enum BirdNode {
 
     static func make(at position: CGPoint) -> SKNode {
         let container = SKNode()
+        container.name = playerName
         container.position = position
         container.zPosition = 10
 
@@ -37,9 +39,10 @@ enum BirdNode {
 
         container.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 36, height: 42))
         container.physicsBody?.allowsRotation = false
+        container.physicsBody?.restitution = 0
         container.physicsBody?.categoryBitMask = PhysicsCategory.bird
-        container.physicsBody?.contactTestBitMask = PhysicsCategory.pipe | PhysicsCategory.ground
-        container.physicsBody?.collisionBitMask = PhysicsCategory.pipe | PhysicsCategory.ground
+        container.physicsBody?.contactTestBitMask = PhysicsCategory.pipe | PhysicsCategory.ground | PhysicsCategory.fire
+        container.physicsBody?.collisionBitMask = PhysicsCategory.ground
         container.physicsBody?.isDynamic = false
 
         return container
@@ -103,8 +106,8 @@ enum BirdNode {
     }
 
     static func restoreCollisions(_ bird: SKNode) {
-        bird.physicsBody?.collisionBitMask = PhysicsCategory.pipe | PhysicsCategory.ground
-        bird.physicsBody?.contactTestBitMask = PhysicsCategory.pipe | PhysicsCategory.ground
+        bird.physicsBody?.collisionBitMask = PhysicsCategory.ground
+        bird.physicsBody?.contactTestBitMask = PhysicsCategory.pipe | PhysicsCategory.ground | PhysicsCategory.fire
     }
 
     static func playVictoryExit(_ bird: SKNode, in scene: SKScene, completion: @escaping () -> Void) {

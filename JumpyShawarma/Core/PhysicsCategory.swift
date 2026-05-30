@@ -4,4 +4,5 @@ enum PhysicsCategory {
     static let pipe: UInt32 = 0x1 << 1
     static let ground: UInt32 = 0x1 << 2
     static let score: UInt32 = 0x1 << 3
+    static let fire: UInt32 = 0x1 << 4
 }
