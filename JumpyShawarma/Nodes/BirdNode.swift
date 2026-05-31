@@ -107,7 +107,7 @@ enum BirdNode {
 
     static func restoreBossCollisions(_ bird: SKNode) {
         bird.physicsBody?.collisionBitMask = PhysicsCategory.ground
-        bird.physicsBody?.contactTestBitMask = PhysicsCategory.none
+        bird.physicsBody?.contactTestBitMask = PhysicsCategory.ground
     }
 
     static func playVictoryExit(_ bird: SKNode, in scene: SKScene, completion: @escaping () -> Void) {

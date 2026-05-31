@@ -554,13 +554,17 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     // MARK: - Contacts
 
     func didBegin(_ contact: SKPhysicsContact) {
+        let masks = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+
         if state.isBossFight {
+            if masks & PhysicsCategory.ground != 0 {
+                guard !isInvincible else { return }
+                endGame()
+            }
             return
         }
 
         guard state.isPlaying else { return }
-
-        let masks = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
 
         if masks == PhysicsCategory.bird | PhysicsCategory.score {
             handleScoreContact(contact)
