@@ -13,6 +13,12 @@ enum BackgroundBuilder {
             addTopDecorations(to: scene, drop: stringLightsDrop) {
                 addStringLights(to: $0, sceneWidth: scene.size.width, theme: theme)
             }
+        case .closingTime:
+            addClosingTimeStallSilhouettes(to: scene, theme: theme)
+            addClosingTimeGlow(to: scene, theme: theme)
+            addTopDecorations(to: scene, drop: stringLightsDrop) {
+                addClosingTimeStringLights(to: $0, sceneWidth: scene.size.width, theme: theme)
+            }
         case .downtownRush:
             addCitySilhouettes(to: scene, theme: theme)
             addTopDecorations(to: scene, drop: neonSignsDrop) {
@@ -33,7 +39,7 @@ enum BackgroundBuilder {
         let drop: CGFloat
         switch theme.id {
         case .downtownRush: drop = neonSignsDrop
-        case .nightAlley: drop = stringLightsDrop
+        case .nightAlley, .closingTime: drop = stringLightsDrop
         default: return
         }
 
@@ -139,6 +145,117 @@ enum BackgroundBuilder {
             bulb.position = CGPoint(x: x, y: bulbY)
             bulb.zPosition = 5
             GameTheme.pulse(node: bulb, minAlpha: 0.5, maxAlpha: 1.0, duration: 0.7 + Double(index) * 0.08)
+            root.addChild(bulb)
+        }
+    }
+
+    private static func addClosingTimeStallSilhouettes(to scene: SKScene, theme: ThemePalette) {
+        let width = scene.size.width
+        let groundTop = GameConstants.groundHeight + 28
+
+        let stalls: [(xRatio: CGFloat, widthRatio: CGFloat, height: CGFloat, lit: Bool)] = [
+            (0.12, 0.24, 110, true),
+            (0.48, 0.20, 96, false),
+            (0.78, 0.22, 118, true),
+        ]
+
+        for stall in stalls {
+            let stallWidth = width * stall.widthRatio
+            let body = SKShapeNode(rectOf: CGSize(width: stallWidth, height: stall.height), cornerRadius: 4)
+            body.fillColor = theme.silhouette
+            body.strokeColor = .clear
+            body.position = CGPoint(
+                x: width * stall.xRatio + stallWidth / 2,
+                y: groundTop + stall.height / 2
+            )
+            body.zPosition = -20
+            scene.addChild(body)
+
+            let awningPath = CGMutablePath()
+            awningPath.move(to: CGPoint(x: -stallWidth / 2 - 6, y: stall.height / 2))
+            awningPath.addLine(to: CGPoint(x: stallWidth / 2 + 6, y: stall.height / 2))
+            awningPath.addLine(to: CGPoint(x: stallWidth / 2, y: stall.height / 2 + 22))
+            awningPath.addLine(to: CGPoint(x: -stallWidth / 2, y: stall.height / 2 + 18))
+            awningPath.closeSubpath()
+
+            let awning = SKShapeNode(path: awningPath)
+            awning.fillColor = theme.awning.withAlphaComponent(stall.lit ? 0.35 : 0.18)
+            awning.strokeColor = .clear
+            awning.zPosition = 1
+            body.addChild(awning)
+
+            if stall.lit {
+                let window = SKShapeNode(rectOf: CGSize(width: stallWidth * 0.35, height: 18), cornerRadius: 3)
+                window.fillColor = theme.accentGlow
+                window.strokeColor = .clear
+                window.position = CGPoint(x: 0, y: -stall.height * 0.08)
+                window.zPosition = 2
+                GameTheme.pulse(node: window, minAlpha: 0.22, maxAlpha: 0.62, duration: 1.8)
+                body.addChild(window)
+            }
+        }
+    }
+
+    private static func addClosingTimeGlow(to scene: SKScene, theme: ThemePalette) {
+        let width = scene.size.width
+        let height = scene.size.height
+
+        let horizon = SKShapeNode(rectOf: CGSize(width: width + 40, height: height * 0.28))
+        horizon.fillColor = theme.accentGlow.withAlphaComponent(0.10)
+        horizon.strokeColor = .clear
+        horizon.position = CGPoint(x: width / 2, y: height * 0.18)
+        horizon.zPosition = -25
+        scene.addChild(horizon)
+
+        let lamp = SKShapeNode(circleOfRadius: 28)
+        lamp.fillColor = theme.accentSecondary.withAlphaComponent(0.12)
+        lamp.strokeColor = theme.accent.withAlphaComponent(0.22)
+        lamp.lineWidth = 1.5
+        lamp.position = CGPoint(x: width * 0.22, y: height * 0.62)
+        lamp.zPosition = -22
+        GameTheme.pulse(node: lamp, minAlpha: 0.45, maxAlpha: 0.85, duration: 1.6)
+        scene.addChild(lamp)
+    }
+
+    private static func addClosingTimeStringLights(to root: SKNode, sceneWidth width: CGFloat, theme: ThemePalette) {
+        let y: CGFloat = 0
+        let litIndices: Set<Int> = [0, 2, 4, 6]
+
+        let wire = SKShapeNode()
+        let wirePath = CGMutablePath()
+        wirePath.move(to: CGPoint(x: 24, y: y))
+        wirePath.addQuadCurve(to: CGPoint(x: width - 24, y: y - 8), control: CGPoint(x: width / 2, y: y + 26))
+        wire.path = wirePath
+        wire.strokeColor = theme.wire
+        wire.lineWidth = 2
+        wire.zPosition = 3
+        root.addChild(wire)
+
+        let bulbCount = 7
+        for index in 0..<bulbCount {
+            let t = CGFloat(index) / CGFloat(bulbCount - 1)
+            let x = 24 + (width - 48) * t
+            let sag = sin(t * .pi) * 18
+            let bulbY = y - 8 * t - sag
+            let isLit = litIndices.contains(index)
+
+            let cord = SKShapeNode(rectOf: CGSize(width: 2, height: 10))
+            cord.fillColor = theme.metalMid
+            cord.strokeColor = .clear
+            cord.position = CGPoint(x: x, y: bulbY + 8)
+            cord.zPosition = 4
+            root.addChild(cord)
+
+            let bulb = SKShapeNode(circleOfRadius: 5)
+            bulb.fillColor = isLit ? theme.accent : theme.metalMid
+            bulb.strokeColor = theme.textPrimary.withAlphaComponent(isLit ? 0.25 : 0.12)
+            bulb.lineWidth = 1
+            bulb.position = CGPoint(x: x, y: bulbY)
+            bulb.zPosition = 5
+            bulb.alpha = isLit ? 1.0 : 0.35
+            if isLit {
+                GameTheme.pulse(node: bulb, minAlpha: 0.35, maxAlpha: 0.75, duration: 1.2 + Double(index) * 0.1)
+            }
             root.addChild(bulb)
         }
     }

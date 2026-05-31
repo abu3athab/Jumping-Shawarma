@@ -201,7 +201,7 @@ final class PipeSpawner {
     private func spawnPair(in scene: SKScene) {
         let size = scene.size
         let pipeWidth = level.pipeWidth
-        let gapHeight = GameConstants.gapHeight
+        let gapHeight = level.gapHeight
         let bounds = gapCenterBounds(in: size)
         let centerY = pickGapCenterY(minY: bounds.minY, maxY: bounds.maxY)
 
@@ -252,7 +252,7 @@ final class PipeSpawner {
     }
 
     private func gapCenterBounds(in size: CGSize) -> (minY: CGFloat, maxY: CGFloat) {
-        let gapHalf = GameConstants.gapHeight / 2
+        let gapHalf = level.gapHeight / 2
         let amplitude = level.hasMovingObstacles ? level.obstacleVerticalAmplitude : 0
         let edgeMargin: CGFloat = 120 + amplitude * 0.35
         let maxY = size.height - edgeMargin - gapHalf - amplitude

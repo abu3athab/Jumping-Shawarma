@@ -55,6 +55,7 @@ enum LevelThemeID {
     case downtownRush
     case rooftopShift
     case forgeFlames
+    case closingTime
 }
 
 struct ThemePalette {
@@ -149,5 +150,24 @@ struct ThemePalette {
         awning: GameTheme.color(0.78, 0.18, 0.08),
         silhouette: GameTheme.color(0.06, 0.03, 0.04, 0.72),
         wire: GameTheme.color(0.35, 0.16, 0.1, 0.55)
+    )
+
+    static let closingTime = ThemePalette(
+        id: .closingTime,
+        background: GameTheme.color(0.28, 0.12, 0.10),
+        accent: GameTheme.color(0.92, 0.72, 0.28),
+        accentSecondary: GameTheme.color(0.88, 0.38, 0.10),
+        accentGlow: GameTheme.color(1.0, 0.52, 0.14, 0.38),
+        textPrimary: GameTheme.color(0.92, 0.86, 0.76),
+        metalDark: GameTheme.color(0.12, 0.08, 0.07),
+        metalMid: GameTheme.color(0.22, 0.18, 0.16),
+        metalLight: GameTheme.color(0.42, 0.36, 0.32),
+        groundDark: GameTheme.color(0.26, 0.18, 0.14),
+        groundLight: GameTheme.color(0.32, 0.22, 0.18),
+        groundGlow: GameTheme.color(1.0, 0.48, 0.12, 0.35),
+        counter: GameTheme.color(0.52, 0.44, 0.38),
+        awning: GameTheme.color(0.48, 0.10, 0.08),
+        silhouette: GameTheme.color(0.05, 0.03, 0.03, 0.72),
+        wire: GameTheme.color(0.16, 0.12, 0.10, 0.45)
     )
 }

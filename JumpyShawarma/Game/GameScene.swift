@@ -16,6 +16,9 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     private var hasUsedContinue = false
     private var isInvincible = false
     private var lastUpdateTime: TimeInterval = 0
+    private var bossFight: BossFightController?
+    private var bossFightLockedX: CGFloat = 0
+    private var isBossFightPaused = false
 
     private static let gameOverSound = SKAction.playSoundFileNamed("gameOverSound.caf", waitForCompletion: false)
 
@@ -56,9 +59,12 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         switch state {
         case .ready:
             BirdNode.reset(bird, in: size)
-        case .playing, .gameOver, .continueCountdown:
+        case .playing, .gameOver, .continueCountdown, .bossFight:
             if oldSize.width > 0, oldSize.height > 0, oldSize != size {
                 reflowWorldPositions(from: oldSize, to: size)
+                if state.isBossFight {
+                    bossFightLockedX = bird.position.x
+                }
             }
         default:
             break
@@ -153,6 +159,9 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         BirdNode.reset(bird, in: size)
         bird.isHidden = false
         BirdNode.removeHungryCustomer(from: self)
+        bossFight?.cleanup()
+        bossFight = nil
+        isBossFightPaused = false
         scoreManager.reset()
         pipeSpawner.removeAll(from: self)
         pipeSpawner.resetTimer()
@@ -173,7 +182,14 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     private func endGame() {
-        guard state.isPlaying else { return }
+        guard state.isPlaying || state.isBossFight else { return }
+
+        if state.isBossFight {
+            bossFight?.cleanup()
+            bossFight = nil
+            isBossFightPaused = false
+            hud.hideBossFight()
+        }
 
         continueSnapshot = RunSnapshot(
             score: scoreManager.current,
@@ -258,6 +274,63 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
 
+    private func beginBossFight() {
+        guard state.isPlaying else { return }
+
+        state = .bossFight
+        onStateChange?(.bossFight)
+        pipeSpawner.disableSpawning()
+        pipeSpawner.exitRemainingObstacles(in: self)
+        FireHazard.removeAll(from: self)
+        BirdNode.restoreBossCollisions(bird)
+        bossFightLockedX = bird.position.x
+        isBossFightPaused = true
+        bird.physicsBody?.velocity = .zero
+        BirdNode.stop(bird)
+
+        let controller = BossFightController(
+            theme: level.theme,
+            onHealthChanged: { [weak self] percent in
+                self?.hud.updateBossHealth(percent)
+            },
+            onDefeated: { [weak self] in
+                self?.completeBossFight()
+            }
+        )
+        bossFight = controller
+        controller.start(in: self)
+        controller.setPaused(true)
+        hud.showBossFightHold()
+    }
+
+    private func resumeBossFight() {
+        guard state.isBossFight, isBossFightPaused else { return }
+
+        isBossFightPaused = false
+        bossFight?.setPaused(false)
+        hud.hideBossFightHold()
+        BirdNode.startFlying(bird)
+        BirdNode.flap(bird)
+        bossFight?.shootPlayerFire(from: bird)
+    }
+
+    private func completeBossFight() {
+        guard state.isBossFight else { return }
+
+        bossFight?.cleanup()
+        bossFight = nil
+        isBossFightPaused = false
+        BirdNode.stop(bird)
+
+        state = .levelComplete
+        onStateChange?(.levelComplete)
+        pipeSpawner.removeAll(from: self)
+        scoreManager.saveBestIfNeeded()
+        LevelProgress.markCompleted(level)
+        hud.hideBossFight()
+        hud.showLevelComplete(level: level)
+    }
+
     private func beginVictorySequence() {
         guard state.isPlaying else { return }
 
@@ -288,6 +361,31 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
     override func update(_ currentTime: TimeInterval) {
         lastUpdateTime = currentTime
+
+        if state.isBossFight {
+            lockBirdHorizontalPosition()
+
+            if !isBossFightPaused {
+                BirdNode.updateRotation(bird)
+                if let result = bossFight?.update(currentTime: currentTime, bird: bird) {
+                    switch result {
+                    case .playerHit:
+                        guard !isInvincible else { break }
+                        endGame()
+                    case .bossDamaged:
+                        break
+                    }
+                }
+            }
+
+            if !isBossFightPaused,
+               !isInvincible,
+               bird.position.y > size.height + 40 {
+                endGame()
+            }
+            return
+        }
+
         guard state.isPlaying else { return }
 
         pipeSpawner.update(currentTime: currentTime, scene: self)
@@ -295,6 +393,14 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
         if !isInvincible && (bird.position.y > size.height + 40 || bird.position.y < -40) {
             endGame()
+        }
+    }
+
+    private func lockBirdHorizontalPosition() {
+        bird.position.x = bossFightLockedX
+        if var velocity = bird.physicsBody?.velocity {
+            velocity.dx = 0
+            bird.physicsBody?.velocity = velocity
         }
     }
 
@@ -306,6 +412,13 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
             startGame()
         case .playing:
             BirdNode.flap(bird)
+        case .bossFight:
+            if isBossFightPaused {
+                resumeBossFight()
+                return
+            }
+            BirdNode.flap(bird)
+            bossFight?.shootPlayerFire(from: bird)
         case .victoryRun:
             break
         case .gameOver:
@@ -354,6 +467,10 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     // MARK: - Contacts
 
     func didBegin(_ contact: SKPhysicsContact) {
+        if state.isBossFight {
+            return
+        }
+
         guard state.isPlaying else { return }
 
         let masks = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
@@ -386,7 +503,11 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         hud.updateScore(score, goal: level.ordersRequired)
 
         if score >= level.ordersRequired {
-            beginVictorySequence()
+            if level.hasBossFight {
+                beginBossFight()
+            } else {
+                beginVictorySequence()
+            }
         }
     }
 }

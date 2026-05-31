@@ -35,6 +35,18 @@ enum GameConstants {
 
     static let fireballSpeed: CGFloat = 175
     static let fireballTravelDistance: CGFloat = 300
+
+    static let bossHitsToDefeat = 10
+    static let bossDamagePercent = 10
+    static let bossFireInterval: TimeInterval = 0.85
+    static let bossPlayerFireCooldown: TimeInterval = 0.28
+    static let bossPlayerFireSpeed: CGFloat = 440
+    static let bossEnemyFireSpeed: CGFloat = 250
+    static let bossCustomerHeightRatio: CGFloat = 0.38
+    static let bossCustomerCenterYRatio: CGFloat = 0.52
+    static let bossCustomerInsetRatio: CGFloat = 0.14
+    static let bossFireHitRadius: CGFloat = 11
+    static let birdHitRadius: CGFloat = 18
 }
 
 enum GameHUDLayout {

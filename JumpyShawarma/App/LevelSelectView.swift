@@ -121,7 +121,7 @@ private struct LevelRow: View {
             return "Completed · \(level.ordersRequired) orders"
         }
         if isUnlocked {
-            return "Complete \(level.ordersRequired) orders"
+            return level.levelDesciption
         }
         if let previous = level.previous {
             return "Complete Level \(previous.id) to unlock"

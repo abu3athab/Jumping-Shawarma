@@ -5,4 +5,6 @@ enum PhysicsCategory {
     static let ground: UInt32 = 0x1 << 2
     static let score: UInt32 = 0x1 << 3
     static let fire: UInt32 = 0x1 << 4
+    static let boss: UInt32 = 0x1 << 5
+    static let playerFire: UInt32 = 0x1 << 6
 }
