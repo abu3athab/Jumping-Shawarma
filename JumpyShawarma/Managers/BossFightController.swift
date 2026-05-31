@@ -1,7 +1,7 @@
 import SpriteKit
 
 final class BossFightController {
-    static let bossName = "bossCustomer"
+    static let bossName = "boss1"
     static let playerFireName = "playerFire"
 
     private weak var scene: SKScene?
@@ -14,8 +14,8 @@ final class BossFightController {
     private let onHealthChanged: (Int) -> Void
     private let onDefeated: () -> Void
 
-    private static let customerTexture: SKTexture = {
-        let texture = SKTexture(imageNamed: "HungryCustomer")
+    private static let boss1Texture: SKTexture = {
+        let texture = SKTexture(imageNamed: "Boss1")
         texture.preload {}
         texture.filteringMode = .linear
         return texture
@@ -42,19 +42,19 @@ final class BossFightController {
         onHealthChanged(healthPercent)
 
         let sceneSize = scene.size
-        let customerHeight = sceneSize.height * GameConstants.bossCustomerHeightRatio
-        let aspect = Self.customerTexture.size().width / Self.customerTexture.size().height
-        let customerSize = CGSize(width: customerHeight * aspect, height: customerHeight)
+        let bossHeight = sceneSize.height * GameConstants.boss1HeightRatio
+        let aspect = Self.boss1Texture.size().width / Self.boss1Texture.size().height
+        let bossSize = CGSize(width: bossHeight * aspect, height: bossHeight)
 
-        boss = SKSpriteNode(texture: Self.customerTexture, size: customerSize)
+        boss = SKSpriteNode(texture: Self.boss1Texture, size: bossSize)
         boss.name = Self.bossName
         boss.zPosition = 9
         boss.position = CGPoint(
-            x: sceneSize.width - customerSize.width * GameConstants.bossCustomerInsetRatio,
-            y: sceneSize.height * GameConstants.bossCustomerCenterYRatio
+            x: sceneSize.width - bossSize.width * GameConstants.boss1InsetRatio,
+            y: sceneSize.height * GameConstants.boss1CenterYRatio
         )
 
-        let body = SKPhysicsBody(rectangleOf: CGSize(width: customerSize.width * 0.42, height: customerSize.height * 0.72))
+        let body = SKPhysicsBody(rectangleOf: CGSize(width: bossSize.width * 0.50, height: bossSize.height * 0.62))
         body.isDynamic = false
         body.categoryBitMask = PhysicsCategory.boss
         body.contactTestBitMask = PhysicsCategory.playerFire
@@ -203,8 +203,8 @@ final class BossFightController {
         guard let scene, let boss else { return }
 
         let mouth = CGPoint(
-            x: boss.position.x - boss.size.width * GameConstants.victoryMouthOffsetXRatio,
-            y: boss.position.y - boss.size.height * GameConstants.victoryMouthOffsetYRatio
+            x: boss.position.x - boss.size.width * GameConstants.boss1MouthOffsetXRatio,
+            y: boss.position.y - boss.size.height * GameConstants.boss1MouthOffsetYRatio
         )
 
         let dx = bird.position.x - mouth.x
