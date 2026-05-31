@@ -23,20 +23,22 @@ final class BossFightController {
 
     init(
         theme: ThemePalette,
+        hitsRemaining: Int = GameConstants.bossHitsToDefeat,
         onHealthChanged: @escaping (Int) -> Void,
         onDefeated: @escaping () -> Void
     ) {
         self.theme = theme
-        self.hitsRemaining = GameConstants.bossHitsToDefeat
+        self.hitsRemaining = hitsRemaining
         self.onHealthChanged = onHealthChanged
         self.onDefeated = onDefeated
     }
+
+    var currentHitsRemaining: Int { hitsRemaining }
 
     func start(in scene: SKScene) {
         self.scene = scene
         lastBossShotTime = 0
         canPlayerShoot = true
-        hitsRemaining = GameConstants.bossHitsToDefeat
         onHealthChanged(healthPercent)
 
         let sceneSize = scene.size
@@ -59,9 +61,11 @@ final class BossFightController {
         body.collisionBitMask = PhysicsCategory.none
         boss.physicsBody = body
 
-        boss.alpha = 0
+        boss.alpha = hitsRemaining == GameConstants.bossHitsToDefeat ? 0 : 1
         scene.addChild(boss)
-        boss.run(.fadeIn(withDuration: 0.45))
+        if boss.alpha == 0 {
+            boss.run(.fadeIn(withDuration: 0.45))
+        }
 
         startBossShooting()
     }
