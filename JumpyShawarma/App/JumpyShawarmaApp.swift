@@ -27,18 +27,67 @@ struct JumpyShawarmaApp: App {
 
     var body: some Scene {
         WindowGroup {
+            AppRootView()
+                .environmentObject(rewardedAdManager)
+        }
+    }
+}
+
+private struct AppRootView: View {
+    @EnvironmentObject private var rewardedAdManager: RewardedAdManager
+    @State private var showSplash = true
+
+    var body: some View {
+        ZStack {
             RootView()
                 .background(AppColors.dashboard.ignoresSafeArea())
-                .environmentObject(rewardedAdManager)
-                .onAppear {
-                    rewardedAdManager.prepare()
-                }
+                .opacity(showSplash ? 0 : 1)
+
+            if showSplash {
+                SplashView()
+                    .transition(.opacity)
+            }
+        }
+        .task {
+            rewardedAdManager.prepare()
+            GameAssetLoader.preloadIfNeeded()
+            try? await Task.sleep(for: .seconds(GameConstants.splashDuration))
+            withAnimation(.easeOut(duration: 0.25)) {
+                showSplash = false
+            }
+        }
+    }
+}
+
+private struct SplashView: View {
+    var body: some View {
+        ZStack {
+            AppColors.dashboard
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Image("ShawarmaWrap")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 220, height: 160)
+
+                Text("Jumpy Shawarma")
+                    .font(.system(size: 30, weight: .bold))
+                    .foregroundStyle(AppColors.splashTitle)
+
+                Text("Serve the night shift")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(AppColors.splashSubtitle)
+            }
+            .offset(y: -36)
         }
     }
 }
 
 private enum AppColors {
     static let dashboard = Color(red: 0.42, green: 0.2, blue: 0.16)
+    static let splashTitle = Color(red: 0.98, green: 0.93, blue: 0.82)
+    static let splashSubtitle = Color(red: 1.0, green: 0.84, blue: 0.35).opacity(0.9)
 }
 
 struct RootView: View {

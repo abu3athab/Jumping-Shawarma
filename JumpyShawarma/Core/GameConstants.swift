@@ -40,6 +40,7 @@ enum GameConstants {
     static let continueInvincibilityDuration: TimeInterval = 0.8
     static let continueCountdownStepDuration: TimeInterval = 1.0
     static let continueSpawnClearance: CGFloat = 140
+    static let splashDuration: TimeInterval = 2.0
 
     static let fireballSpeed: CGFloat = 175
     static let fireballTravelDistance: CGFloat = 300
