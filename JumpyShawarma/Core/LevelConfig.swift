@@ -86,17 +86,6 @@ enum LevelConfig: Int, CaseIterable {
         }
     }
 
-    var featureSummary: String {
-        switch self {
-        case .rooftopShift:
-            return "\(ordersRequired) orders · Moving gaps"
-        case .forgeFlames:
-            return "\(ordersRequired) orders · Moving gaps · Fire"
-        default:
-            return "Serve \(ordersRequired) orders"
-        }
-    }
-
     static func level(for id: Int) -> LevelConfig? {
         LevelConfig(rawValue: id)
     }
