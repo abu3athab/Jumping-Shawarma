@@ -42,7 +42,6 @@ enum PipeNode {
         let pipe = SKSpriteNode(color: .clear, size: size)
         pipe.name = pipeName
         pipe.zPosition = 3
-        attachPhysics(to: pipe, size: size)
 
         let capTexture = isTop ? assets.capTop : assets.capBottom
         let pipeWidth = size.width
@@ -82,6 +81,8 @@ enum PipeNode {
                 addTiledBody(to: crop, texture: assets.body, width: pipeWidth, height: bodyHeight, centerY: bodyCenterY)
             }
         }
+
+        attachPhysics(to: pipe, size: size, isTop: isTop)
 
         return pipe
     }
@@ -132,8 +133,16 @@ enum PipeNode {
         }
     }
 
-    private static func attachPhysics(to pipe: SKSpriteNode, size: CGSize) {
-        pipe.physicsBody = SKPhysicsBody(rectangleOf: size)
+    private static func attachPhysics(to pipe: SKSpriteNode, size: CGSize, isTop: Bool) {
+        let gapInset = GameConstants.pipePhysicsGapInset
+        let physicsWidth = size.width * GameConstants.pipePhysicsWidthRatio
+        let physicsHeight = max(1, size.height - gapInset)
+        let centerY = isTop ? gapInset / 2 : -gapInset / 2
+
+        pipe.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: physicsWidth, height: physicsHeight),
+            center: CGPoint(x: 0, y: centerY)
+        )
         pipe.physicsBody?.isDynamic = false
         pipe.physicsBody?.restitution = 0
         pipe.physicsBody?.categoryBitMask = PhysicsCategory.pipe

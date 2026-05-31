@@ -10,6 +10,13 @@ enum GameConstants {
     static let iPadPipeSpawnInterval: TimeInterval = 1.8
     static let pipeSpeed: CGFloat = 180
     static let pipeWidth: CGFloat = 58
+    static let pipePhysicsWidthRatio: CGFloat = 0.84
+    static let pipePhysicsGapInsetPhone: CGFloat = 6
+    static let pipePhysicsGapInsetPad: CGFloat = 14
+
+    static var pipePhysicsGapInset: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .pad ? pipePhysicsGapInsetPad : pipePhysicsGapInsetPhone
+    }
 
     static let birdStartXRatio: CGFloat = 0.32
     static let birdStartYRatio: CGFloat = 0.55
