@@ -32,8 +32,8 @@ enum LevelConfig: Int, CaseIterable {
         case .nightAlley:   30
         case .downtownRush: 35
         case .rooftopShift: 40
-        case .forgeFlames:  50
-        case .closingTime:  2
+        case .forgeFlames:  45
+        case .closingTime:  35
         }
     }
     

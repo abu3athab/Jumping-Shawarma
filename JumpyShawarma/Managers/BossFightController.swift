@@ -118,7 +118,8 @@ final class BossFightController {
             in: scene,
             velocity: CGVector(dx: GameConstants.bossPlayerFireSpeed, dy: 0),
             category: PhysicsCategory.playerFire,
-            contactMask: PhysicsCategory.boss
+            contactMask: PhysicsCategory.boss,
+            isPlayerFire: true
         )
     }
 
@@ -234,18 +235,19 @@ final class BossFightController {
         in scene: SKScene,
         velocity: CGVector,
         category: UInt32,
-        contactMask: UInt32
+        contactMask: UInt32,
+        isPlayerFire: Bool = false
     ) {
-        let ball = SKShapeNode(ellipseOf: CGSize(width: 20, height: 14))
-        ball.fillColor = theme.accentSecondary
-        ball.strokeColor = theme.accent
+        let ball = SKShapeNode(ellipseOf: CGSize(width: isPlayerFire ? 22 : 20, height: isPlayerFire ? 15 : 14))
+        ball.fillColor = isPlayerFire ? GameTheme.playerFireFill : theme.accentSecondary
+        ball.strokeColor = isPlayerFire ? GameTheme.playerFireStroke : theme.accent
         ball.lineWidth = 2
         ball.name = name
         ball.position = position
         ball.zPosition = 8
 
-        let core = SKShapeNode(ellipseOf: CGSize(width: 9, height: 6))
-        core.fillColor = theme.accentGlow
+        let core = SKShapeNode(ellipseOf: CGSize(width: isPlayerFire ? 10 : 9, height: isPlayerFire ? 7 : 6))
+        core.fillColor = isPlayerFire ? GameTheme.playerFireCore : theme.accentGlow
         core.strokeColor = .clear
         core.zPosition = 1
         ball.addChild(core)

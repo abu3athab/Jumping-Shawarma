@@ -15,6 +15,11 @@ enum GameTheme {
     static let awning = color(0.62, 0.14, 0.12)
     static let steam = color(1.0, 1.0, 1.0, 0.18)
 
+    /// Boss fight — player shots (cool blue vs boss orange fire).
+    static let playerFireFill = color(0.28, 0.82, 1.0)
+    static let playerFireStroke = color(0.08, 0.58, 0.96)
+    static let playerFireCore = color(0.82, 0.98, 1.0)
+
     static let titleFont = "AvenirNext-Heavy"
     static let bodyFont = "AvenirNext-DemiBold"
     static let scoreFont = "AvenirNext-Bold"
