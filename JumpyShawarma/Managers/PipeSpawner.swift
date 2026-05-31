@@ -45,7 +45,7 @@ final class PipeSpawner {
     }
 
     func scheduleNextSpawn(after delay: TimeInterval, from currentTime: TimeInterval) {
-        lastSpawnTime = currentTime - GameConstants.pipeSpawnInterval + delay
+        lastSpawnTime = currentTime - GameConstants.pipeSpawnIntervalForDevice + delay
         canSpawn = true
     }
 
@@ -193,7 +193,7 @@ final class PipeSpawner {
         if lastSpawnTime == 0 {
             lastSpawnTime = currentTime
         }
-        guard currentTime - lastSpawnTime >= GameConstants.pipeSpawnInterval else { return }
+        guard currentTime - lastSpawnTime >= GameConstants.pipeSpawnIntervalForDevice else { return }
         spawnPair(in: scene)
         lastSpawnTime = currentTime
     }

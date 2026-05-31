@@ -1,11 +1,13 @@
 import CoreGraphics
 import Foundation
+import UIKit
 
 enum GameConstants {
     static let gravity: CGFloat = -9.0
     static let flapImpulse: CGFloat = 30
 
     static let pipeSpawnInterval: TimeInterval = 1.45
+    static let iPadPipeSpawnInterval: TimeInterval = 1.8
     static let pipeSpeed: CGFloat = 180
     static let pipeWidth: CGFloat = 58
 
@@ -46,6 +48,10 @@ enum GameConstants {
     static let bossCustomerInsetRatio: CGFloat = 0.14
     static let bossFireHitRadius: CGFloat = 11
     static let birdHitRadius: CGFloat = 18
+
+    static var pipeSpawnIntervalForDevice: TimeInterval {
+        UIDevice.current.userInterfaceIdiom == .pad ? iPadPipeSpawnInterval : pipeSpawnInterval
+    }
 }
 
 enum GameHUDLayout {
