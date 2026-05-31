@@ -26,14 +26,14 @@ enum LevelConfig: Int, CaseIterable {
         case .closingTime: return "Closing Time"
         }
     }
-
+    
     var ordersRequired: Int {
         switch self {
-        case .nightAlley: return 30
-        case .downtownRush: return 40
-        case .rooftopShift: return 50
-        case .forgeFlames: return 60
-        case .closingTime: return 35
+        case .nightAlley:   30
+        case .downtownRush: 40
+        case .rooftopShift: 50
+        case .forgeFlames:  60
+        case .closingTime:  35
         }
     }
     
@@ -43,14 +43,14 @@ enum LevelConfig: Int, CaseIterable {
         }
         return "Complete \(ordersRequired) orders"
     }
-
+    
     var theme: ThemePalette {
         switch self {
-        case .nightAlley: return .nightAlley
-        case .downtownRush: return .downtownRush
-        case .rooftopShift: return .rooftopShift
-        case .forgeFlames: return .forgeFlames
-        case .closingTime: return .closingTime
+        case .nightAlley:   .nightAlley
+        case .downtownRush: .downtownRush
+        case .rooftopShift: .rooftopShift
+        case .forgeFlames:  .forgeFlames
+        case .closingTime:  .closingTime
         }
     }
 
@@ -58,9 +58,9 @@ enum LevelConfig: Int, CaseIterable {
 
     var gapHeight: CGFloat {
         switch self {
-        case .forgeFlames: return 228
-        case .closingTime: return 170
-        default: return GameConstants.gapHeight
+        case .nightAlley: 200
+        case .downtownRush: 190
+        case .forgeFlames, .rooftopShift, .closingTime: 175
         }
     }
 
@@ -87,32 +87,32 @@ enum LevelConfig: Int, CaseIterable {
 
     var obstacleVerticalAmplitude: CGFloat {
         switch self {
-        case .rooftopShift: return 82
-        case .forgeFlames: return 68
-        case .closingTime: return 55
-        default: return 0
+        case .rooftopShift: 82
+        case .forgeFlames: 68
+        case .closingTime: 55
+        default: 0
         }
     }
 
     var obstacleVerticalDuration: TimeInterval {
         switch self {
-        case .rooftopShift: return 1.15
-        case .forgeFlames: return 1.25
-        case .closingTime: return 0.78
-        default: return 0
+        case .rooftopShift: 1.15
+        case .forgeFlames: 1.25
+        case .closingTime: 0.78
+        default: 0
         }
     }
 
     var readySubtitle: String {
         switch self {
         case .rooftopShift:
-            return "Serve \(ordersRequired) orders · Gaps move up and down"
+            "Serve \(ordersRequired) orders · Gaps move up and down"
         case .forgeFlames:
-            return "Serve \(ordersRequired) orders · Moving gaps · Dodge the fire"
+            "Serve \(ordersRequired) orders · Moving gaps · Dodge the fire"
         case .closingTime:
-            return "Serve \(ordersRequired) orders · Boss at the end"
+            "Serve \(ordersRequired) orders · Boss at the end"
         default:
-            return "Serve \(ordersRequired) orders · Tap to start"
+            "Serve \(ordersRequired) orders · Tap to start"
         }
     }
 

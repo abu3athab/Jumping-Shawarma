@@ -8,7 +8,6 @@ enum GameConstants {
     static let pipeSpawnInterval: TimeInterval = 1.45
     static let pipeSpeed: CGFloat = 180
     static let pipeWidth: CGFloat = 58
-    static let gapHeight: CGFloat = 158
 
     static let birdStartXRatio: CGFloat = 0.32
     static let birdStartYRatio: CGFloat = 0.55
