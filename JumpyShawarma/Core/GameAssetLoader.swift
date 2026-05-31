@@ -6,7 +6,7 @@ enum GameAssetLoader {
     static func preloadIfNeeded() {
         guard !didPreload else { return }
         didPreload = true
-        UISounds.prepare()
+        GameAudioManager.shared.prepare()
         BirdNode.preloadAssets()
         PipeNode.preloadTextures()
     }

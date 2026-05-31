@@ -20,7 +20,7 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     private var bossFightLockedX: CGFloat = 0
     private var isBossFightPaused = false
 
-    private static let gameOverSound = SKAction.playSoundFileNamed("gameOverSound.caf", waitForCompletion: false)
+    private static var gameOverSound: SKAction { GameAudioManager.shared.gameOverAction }
 
     var onNextLevel: ((LevelConfig) -> Void)?
     var onStateChange: ((GameState) -> Void)?
@@ -523,10 +523,10 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
         switch hud.gameOverAction(at: location) {
         case .watchAd:
-            UISounds.playButtonTap()
+            GameAudioManager.shared.playButtonTap()
             requestContinueWithAd()
         case .retry:
-            UISounds.playButtonTap()
+            GameAudioManager.shared.playButtonTap()
             retryRun()
         case nil:
             break
@@ -539,10 +539,10 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
 
         switch hud.levelCompleteAction(at: location) {
         case .playAgain:
-            UISounds.playButtonTap()
+            GameAudioManager.shared.playButtonTap()
             enterReadyState()
         case .next:
-            UISounds.playButtonTap()
+            GameAudioManager.shared.playButtonTap()
             if let nextLevel = level.next {
                 onNextLevel?(nextLevel)
             }

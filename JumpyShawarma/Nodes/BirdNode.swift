@@ -5,7 +5,7 @@ enum BirdNode {
     static let hungryCustomerName = "hungryCustomer"
     private static let spriteName = "sprite"
     private static let playerSize = CGSize(width: 78, height: 78)
-    private static let jumpSound = SKAction.playSoundFileNamed("jumpSound.caf", waitForCompletion: false)
+    private static var jumpSound: SKAction { GameAudioManager.shared.jumpAction }
     private static let flapScale = SKAction.sequence([
         SKAction.scale(to: 1.08, duration: 0.06),
         SKAction.scale(to: 1.0, duration: 0.08),
@@ -19,11 +19,6 @@ enum BirdNode {
         customerTexture.preload {}
         wrapTexture.filteringMode = .linear
         customerTexture.filteringMode = .linear
-        preloadSounds()
-    }
-
-    static func preloadSounds() {
-        _ = jumpSound
     }
 
     static func make(at position: CGPoint) -> SKNode {

@@ -8,6 +8,7 @@ struct JumpyShawarmaApp: App {
     init() {
         migrateLegacyUserDefaults()
         UIWindow.appearance().backgroundColor = UIColor(red: 0.42, green: 0.2, blue: 0.16, alpha: 1)
+        GameAudioManager.shared.prepare()
     }
 
     private func migrateLegacyUserDefaults() {
@@ -126,7 +127,7 @@ struct GameContainerView: View {
             .overlay(alignment: .topLeading) {
                 if showsLevelsButton {
                     Button(action: {
-                        UISounds.playButtonTap()
+                        GameAudioManager.shared.playButtonTap()
                         onExit()
                     }) {
                         HStack(spacing: 6) {
