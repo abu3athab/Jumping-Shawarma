@@ -224,16 +224,16 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     private func beginContinueAfterAd() {
-        guard state == .gameOver, continueSnapshot != nil else { return }
+        guard state == .gameOver, let snapshot = continueSnapshot else { return }
 
-        if continueSnapshot?.sceneSize != size {
-            reflowWorldPositions(from: continueSnapshot!.sceneSize, to: size)
+        if snapshot.sceneSize != size {
+            reflowWorldPositions(from: snapshot.sceneSize, to: size)
         }
 
-        if let bossResume = continueSnapshot?.bossFightResume {
+        if let bossResume = snapshot.bossFightResume {
             let lockedX = scaledBossLockedX(
                 bossResume.lockedX,
-                from: continueSnapshot!.sceneSize
+                from: snapshot.sceneSize
             )
             bird.position = bossResumePosition(lockedX: lockedX)
         } else {

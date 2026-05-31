@@ -35,6 +35,8 @@
 		F2F064E12FCAE2060040255B /* gameOverSound.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2F064E22FCAE2060040255C /* gameOverSound.caf */; };
 		F2F064D52FCAE2060040254F /* GameAudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F064D62FCAE20600402550 /* GameAudioManager.swift */; };
 		F2F064E32FCAE2060040255D /* GameAssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F064E42FCAE2060040255E /* GameAssetLoader.swift */; };
+		F2F065022FCAE20600402562 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = F2F065012FCAE20600402561 /* GoogleMobileAds */; };
+		F2F065042FCAE20600402564 /* AdMobConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F065032FCAE20600402563 /* AdMobConfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +70,7 @@
 		F2F064E22FCAE2060040255C /* gameOverSound.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = gameOverSound.caf; sourceTree = "<group>"; };
 		F2F064D62FCAE20600402550 /* GameAudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAudioManager.swift; sourceTree = "<group>"; };
 		F2F064E42FCAE2060040255E /* GameAssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAssetLoader.swift; sourceTree = "<group>"; };
+		F2F065032FCAE20600402563 /* AdMobConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2F065022FCAE20600402562 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +148,7 @@
 				A10000020000000000000007 /* GameState.swift */,
 				F2F064D62FCAE20600402550 /* GameAudioManager.swift */,
 				F2F064E42FCAE2060040255E /* GameAssetLoader.swift */,
+				F2F065032FCAE20600402563 /* AdMobConfig.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -205,6 +210,9 @@
 			dependencies = (
 			);
 			name = JumpyShawarma;
+			packageProductDependencies = (
+				F2F065012FCAE20600402561 /* GoogleMobileAds */,
+			);
 			productName = JumpyShawarma;
 			productReference = A10000020000000000000004 /* JumpyShawarma.app */;
 			productType = "com.apple.product-type.application";
@@ -233,6 +241,9 @@
 				Base,
 			);
 			mainGroup = A10000040000000000000001;
+			packageReferences = (
+				F2F065002FCAE20600402560 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			productRefGroup = A10000040000000000000003 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -285,6 +296,7 @@
 				A10000010000000000000010 /* LevelProgress.swift in Sources */,
 				A10000010000000000000013 /* RunSnapshot.swift in Sources */,
 				A10000010000000000000014 /* RewardedAdManager.swift in Sources */,
+				F2F065042FCAE20600402564 /* AdMobConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,6 +480,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F2F065002FCAE20600402560 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F2F065012FCAE20600402561 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F2F065002FCAE20600402560 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000090000000000000001 /* Project object */;
 }

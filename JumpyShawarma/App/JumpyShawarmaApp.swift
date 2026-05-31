@@ -30,6 +30,9 @@ struct JumpyShawarmaApp: App {
             RootView()
                 .background(AppColors.dashboard.ignoresSafeArea())
                 .environmentObject(rewardedAdManager)
+                .onAppear {
+                    rewardedAdManager.prepare()
+                }
         }
     }
 }
@@ -168,9 +171,8 @@ struct GameContainerView: View {
             scene = newScene
         }
         .fullScreenCover(isPresented: $rewardedAdManager.isShowingAd) {
-            SimulatedRewardedAdView { granted in
-                rewardedAdManager.finishRewardedAd(granted: granted)
-            }
+            RewardedAdCover()
+                .environmentObject(rewardedAdManager)
         }
     }
 
