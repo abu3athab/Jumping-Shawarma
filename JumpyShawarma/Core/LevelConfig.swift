@@ -30,9 +30,9 @@ enum LevelConfig: Int, CaseIterable {
     var ordersRequired: Int {
         switch self {
         case .nightAlley:   30
-        case .downtownRush: 40
-        case .rooftopShift: 50
-        case .forgeFlames:  60
+        case .downtownRush: 35
+        case .rooftopShift: 40
+        case .forgeFlames:  50
         case .closingTime:  35
         }
     }
