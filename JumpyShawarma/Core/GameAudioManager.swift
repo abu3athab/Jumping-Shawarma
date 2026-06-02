@@ -1,12 +1,11 @@
 import AVFoundation
-import AudioToolbox
 import SpriteKit
 
 final class GameAudioManager {
     static let shared = GameAudioManager()
 
     private var isPrepared = false
-    private var buttonTapSoundID: SystemSoundID = 0
+    private var buttonTapPlayer: AVAudioPlayer?
 
     private(set) lazy var jumpAction: SKAction = {
         SKAction.playSoundFileNamed("jumpSound.caf", waitForCompletion: false)
@@ -30,14 +29,24 @@ final class GameAudioManager {
 
     func playButtonTap() {
         loadButtonTapIfNeeded()
-        guard buttonTapSoundID != 0 else { return }
-        AudioServicesPlaySystemSound(buttonTapSoundID)
+        guard let buttonTapPlayer else { return }
+        if buttonTapPlayer.isPlaying {
+            buttonTapPlayer.currentTime = 0
+        }
+        buttonTapPlayer.play()
     }
 
     private func loadButtonTapIfNeeded() {
-        guard buttonTapSoundID == 0,
+        guard buttonTapPlayer == nil,
               let url = Bundle.main.url(forResource: "buttonTap", withExtension: "caf") else { return }
-        AudioServicesCreateSystemSoundID(url as CFURL, &buttonTapSoundID)
+
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.prepareToPlay()
+            buttonTapPlayer = player
+        } catch {
+            print("Button tap sound failed to load: \(error.localizedDescription)")
+        }
     }
 
     private func warmAudioSession() {
