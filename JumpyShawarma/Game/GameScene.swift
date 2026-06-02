@@ -478,8 +478,15 @@ final class GameScene: SKScene, SKPhysicsContactDelegate {
         pipeSpawner.update(currentTime: currentTime, scene: self)
         BirdNode.updateRotation(bird)
 
-        if !isInvincible && (bird.position.y > size.height + 40 || bird.position.y < -40) {
-            endGame()
+        if !isInvincible {
+            if PipeNode.intersectsBird(BirdNode.hitFrame(for: bird), in: self) {
+                endGame()
+                return
+            }
+
+            if bird.position.y > size.height + 40 || bird.position.y < -40 {
+                endGame()
+            }
         }
     }
 

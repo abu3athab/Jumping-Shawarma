@@ -34,6 +34,7 @@ enum BirdNode {
 
         container.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 36, height: 42))
         container.physicsBody?.allowsRotation = false
+        container.physicsBody?.usesPreciseCollisionDetection = true
         container.physicsBody?.restitution = 0
         container.physicsBody?.categoryBitMask = PhysicsCategory.bird
         container.physicsBody?.contactTestBitMask = PhysicsCategory.pipe | PhysicsCategory.ground | PhysicsCategory.fire
@@ -41,6 +42,11 @@ enum BirdNode {
         container.physicsBody?.isDynamic = false
 
         return container
+    }
+
+    static func hitFrame(for bird: SKNode) -> CGRect {
+        let inset = GameConstants.birdHitFrameInset
+        return bird.calculateAccumulatedFrame().insetBy(dx: inset, dy: inset)
     }
 
     static func flap(_ bird: SKNode) {

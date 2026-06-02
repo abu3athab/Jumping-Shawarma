@@ -4,6 +4,8 @@ enum PipeNode {
     static let pipeName = "pipe"
     static let scoreZoneName = "scoreZone"
     static let scoredZoneName = "scored"
+    static let capHitboxName = "pipeCapHitbox"
+    static let bodyHitboxName = "pipeBodyHitbox"
 
     private struct SpritePipeTheme {
         let capTop: SKTexture
@@ -82,7 +84,15 @@ enum PipeNode {
             }
         }
 
-        attachPhysics(to: pipe, size: size, isTop: isTop)
+        attachPhysics(
+            to: pipe,
+            pipeSize: size,
+            capWidth: capWidth,
+            capHeight: capHeight,
+            bodyHeight: bodyHeight,
+            columnWidth: pipeWidth,
+            isTop: isTop
+        )
 
         return pipe
     }
@@ -133,21 +143,68 @@ enum PipeNode {
         }
     }
 
-    private static func attachPhysics(to pipe: SKSpriteNode, size: CGSize, isTop: Bool) {
-        let gapInset = GameConstants.pipePhysicsGapInset
-        let physicsWidth = size.width * GameConstants.pipePhysicsWidthRatio
-        let physicsHeight = max(1, size.height - gapInset)
-        let centerY = isTop ? gapInset / 2 : -gapInset / 2
+    private static func attachPhysics(
+        to pipe: SKSpriteNode,
+        pipeSize: CGSize,
+        capWidth: CGFloat,
+        capHeight: CGFloat,
+        bodyHeight: CGFloat,
+        columnWidth: CGFloat,
+        isTop: Bool
+    ) {
+        let capCenterY = isTop
+            ? -pipeSize.height / 2 + capHeight / 2
+            : pipeSize.height / 2 - capHeight / 2
 
-        pipe.physicsBody = SKPhysicsBody(
-            rectangleOf: CGSize(width: physicsWidth, height: physicsHeight),
-            center: CGPoint(x: 0, y: centerY)
+        let capBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: capWidth, height: capHeight),
+            center: CGPoint(x: 0, y: capCenterY)
         )
-        pipe.physicsBody?.isDynamic = false
-        pipe.physicsBody?.restitution = 0
-        pipe.physicsBody?.categoryBitMask = PhysicsCategory.pipe
-        pipe.physicsBody?.contactTestBitMask = PhysicsCategory.bird
-        pipe.physicsBody?.collisionBitMask = PhysicsCategory.none
+
+        var bodies = [capBody]
+
+        let capHitbox = SKSpriteNode(color: .clear, size: CGSize(width: capWidth, height: capHeight))
+        capHitbox.name = capHitboxName
+        capHitbox.position = CGPoint(x: 0, y: capCenterY)
+        pipe.addChild(capHitbox)
+
+        if bodyHeight > 0.5 {
+            let bodyCenterY = isTop
+                ? -pipeSize.height / 2 + capHeight + bodyHeight / 2
+                : pipeSize.height / 2 - capHeight - bodyHeight / 2
+
+            let columnBody = SKPhysicsBody(
+                rectangleOf: CGSize(width: columnWidth, height: bodyHeight),
+                center: CGPoint(x: 0, y: bodyCenterY)
+            )
+            bodies.append(columnBody)
+
+            let bodyHitbox = SKSpriteNode(color: .clear, size: CGSize(width: columnWidth, height: bodyHeight))
+            bodyHitbox.name = bodyHitboxName
+            bodyHitbox.position = CGPoint(x: 0, y: bodyCenterY)
+            pipe.addChild(bodyHitbox)
+        }
+
+        let combined = SKPhysicsBody(bodies: bodies)
+        combined.isDynamic = false
+        combined.restitution = 0
+        combined.categoryBitMask = PhysicsCategory.pipe
+        combined.contactTestBitMask = PhysicsCategory.bird
+        combined.collisionBitMask = PhysicsCategory.none
+        pipe.physicsBody = combined
+    }
+
+    static func intersectsBird(_ birdFrame: CGRect, in scene: SKScene) -> Bool {
+        var hit = false
+        for hitboxName in [capHitboxName, bodyHitboxName] {
+            scene.enumerateChildNodes(withName: hitboxName) { node, stop in
+                guard birdFrame.intersects(node.calculateAccumulatedFrame()) else { return }
+                hit = true
+                stop.pointee = true
+            }
+            if hit { break }
+        }
+        return hit
     }
 
     static func makeScoreZone(at position: CGPoint, gapHeight: CGFloat) -> SKNode {
