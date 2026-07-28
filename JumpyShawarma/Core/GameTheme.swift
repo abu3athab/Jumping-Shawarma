@@ -15,6 +15,11 @@ enum GameTheme {
     static let awning = color(0.62, 0.14, 0.12)
     static let steam = color(1.0, 1.0, 1.0, 0.18)
 
+    /// Boss fight — player shots (cool blue vs boss orange fire).
+    static let playerFireFill = color(0.28, 0.82, 1.0)
+    static let playerFireStroke = color(0.08, 0.58, 0.96)
+    static let playerFireCore = color(0.82, 0.98, 1.0)
+
     static let titleFont = "AvenirNext-Heavy"
     static let bodyFont = "AvenirNext-DemiBold"
     static let scoreFont = "AvenirNext-Bold"
@@ -54,6 +59,8 @@ enum LevelThemeID {
     case nightAlley
     case downtownRush
     case rooftopShift
+    case forgeFlames
+    case closingTime
 }
 
 struct ThemePalette {
@@ -129,5 +136,43 @@ struct ThemePalette {
         awning: GameTheme.color(0.72, 0.22, 0.18),
         silhouette: GameTheme.color(0.12, 0.06, 0.08, 0.65),
         wire: GameTheme.color(0.35, 0.22, 0.18, 0.55)
+    )
+
+    static let forgeFlames = ThemePalette(
+        id: .forgeFlames,
+        background: GameTheme.color(0.12, 0.06, 0.08),
+        accent: GameTheme.color(1.0, 0.55, 0.12),
+        accentSecondary: GameTheme.color(0.98, 0.28, 0.08),
+        accentGlow: GameTheme.color(1.0, 0.42, 0.1, 0.6),
+        textPrimary: GameTheme.color(0.98, 0.88, 0.78),
+        metalDark: GameTheme.color(0.14, 0.08, 0.08),
+        metalMid: GameTheme.color(0.28, 0.14, 0.1),
+        metalLight: GameTheme.color(0.48, 0.28, 0.2),
+        groundDark: GameTheme.color(0.2, 0.1, 0.08),
+        groundLight: GameTheme.color(0.32, 0.16, 0.1),
+        groundGlow: GameTheme.color(1.0, 0.38, 0.08, 0.55),
+        counter: GameTheme.color(0.42, 0.22, 0.16),
+        awning: GameTheme.color(0.78, 0.18, 0.08),
+        silhouette: GameTheme.color(0.06, 0.03, 0.04, 0.72),
+        wire: GameTheme.color(0.35, 0.16, 0.1, 0.55)
+    )
+
+    static let closingTime = ThemePalette(
+        id: .closingTime,
+        background: GameTheme.color(0.28, 0.12, 0.10),
+        accent: GameTheme.color(0.92, 0.72, 0.28),
+        accentSecondary: GameTheme.color(0.88, 0.38, 0.10),
+        accentGlow: GameTheme.color(1.0, 0.52, 0.14, 0.38),
+        textPrimary: GameTheme.color(0.92, 0.86, 0.76),
+        metalDark: GameTheme.color(0.12, 0.08, 0.07),
+        metalMid: GameTheme.color(0.22, 0.18, 0.16),
+        metalLight: GameTheme.color(0.42, 0.36, 0.32),
+        groundDark: GameTheme.color(0.26, 0.18, 0.14),
+        groundLight: GameTheme.color(0.32, 0.22, 0.18),
+        groundGlow: GameTheme.color(1.0, 0.48, 0.12, 0.35),
+        counter: GameTheme.color(0.52, 0.44, 0.38),
+        awning: GameTheme.color(0.48, 0.10, 0.08),
+        silhouette: GameTheme.color(0.05, 0.03, 0.03, 0.72),
+        wire: GameTheme.color(0.16, 0.12, 0.10, 0.45)
     )
 }

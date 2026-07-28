@@ -39,6 +39,10 @@ final class GameHUD {
     private let countdownOverlay: SKShapeNode
     private let countdownLabel: SKLabelNode
     private let countdownCaptionLabel: SKLabelNode
+    private let bossHealthBackdrop: SKShapeNode
+    private let bossHealthFill: SKShapeNode
+    private let bossHealthLabel: SKLabelNode
+    private let bossHealthBarSize = CGSize(width: 300, height: 18)
 
     private var isNextLevelEnabled = false
     private var canWatchAdToContinue = false
@@ -220,13 +224,32 @@ final class GameHUD {
         countdownCaptionLabel.zPosition = 35
         countdownCaptionLabel.isHidden = true
 
+        bossHealthBackdrop = SKShapeNode(rectOf: bossHealthBarSize, cornerRadius: 9)
+        bossHealthBackdrop.fillColor = GameTheme.color(0.08, 0.05, 0.04, 0.88)
+        bossHealthBackdrop.strokeColor = theme.accent.withAlphaComponent(0.55)
+        bossHealthBackdrop.lineWidth = 2
+        bossHealthBackdrop.zPosition = 21
+        bossHealthBackdrop.isHidden = true
+
+        bossHealthFill = SKShapeNode(rectOf: bossHealthBarSize, cornerRadius: 9)
+        bossHealthFill.fillColor = theme.accentSecondary
+        bossHealthFill.strokeColor = .clear
+        bossHealthFill.zPosition = 22
+        bossHealthFill.isHidden = true
+
+        bossHealthLabel = SKLabelNode(fontNamed: GameTheme.bodyFont)
+        bossHealthLabel.fontSize = 13
+        bossHealthLabel.fontColor = theme.textPrimary
+        bossHealthLabel.verticalAlignmentMode = .center
+        bossHealthLabel.horizontalAlignmentMode = .center
+        bossHealthLabel.zPosition = 23
+        bossHealthLabel.isHidden = true
+
         GameTheme.attachShadow(to: scoreLabel)
         GameTheme.attachShadow(to: messageLabel)
         GameTheme.attachShadow(to: completeTitleLabel)
         GameTheme.attachShadow(to: completeMessageLabel)
         GameTheme.attachShadow(to: completeSubLabel)
-
-        layout(for: sceneSize)
     }
 
     func add(to scene: SKScene) {
@@ -252,6 +275,9 @@ final class GameHUD {
         scene.addChild(countdownOverlay)
         scene.addChild(countdownCaptionLabel)
         scene.addChild(countdownLabel)
+        scene.addChild(bossHealthBackdrop)
+        scene.addChild(bossHealthFill)
+        scene.addChild(bossHealthLabel)
     }
 
     func layout(for sceneSize: CGSize, safeAreaTop: CGFloat = 0) {
@@ -310,11 +336,84 @@ final class GameHUD {
         countdownOverlay.position = gameOverOverlay.position
         countdownLabel.position = panelCenter
         countdownCaptionLabel.position = CGPoint(x: panelCenter.x, y: panelCenter.y + 72)
+
+        let bossBarY = GameConstants.groundHeight + 34
+        bossHealthBackdrop.position = CGPoint(x: sceneSize.width / 2, y: bossBarY)
+        bossHealthFill.position = CGPoint(x: sceneSize.width / 2, y: bossBarY)
+        bossHealthLabel.position = CGPoint(x: sceneSize.width / 2, y: bossBarY + 22)
+    }
+
+    func showBossFight() {
+        hideGameOver()
+        hideLevelComplete()
+        messageLabel.text = ""
+        subMessageLabel.text = ""
+        GameTheme.syncShadow(on: messageLabel)
+        scoreCaptionLabel.text = "CLOSING TIME"
+        scoreLabel.text = "BOSS"
+        scoreBadge.alpha = 1.0
+
+        bossHealthBackdrop.isHidden = false
+        bossHealthFill.isHidden = false
+        bossHealthLabel.isHidden = false
+        updateBossHealth(100)
+    }
+
+    func showBossFightHold() {
+        showBossFight()
+
+        countdownOverlay.isHidden = false
+        countdownCaptionLabel.isHidden = false
+        countdownLabel.isHidden = false
+        countdownCaptionLabel.text = "Tap to jump & shoot fire at the boss"
+        countdownLabel.fontSize = 38
+        countdownLabel.text = "Tap to Fight!"
+        countdownLabel.setScale(1.0)
+        countdownLabel.alpha = 1.0
+        countdownLabel.run(.repeatForever(.sequence([
+            .fadeAlpha(to: 1.0, duration: 0.65),
+            .fadeAlpha(to: 0.72, duration: 0.65),
+        ])), withKey: "bossIntroPulse")
+    }
+
+    func hideBossFightHold() {
+        countdownLabel.removeAction(forKey: "bossIntroPulse")
+        countdownOverlay.isHidden = true
+        countdownCaptionLabel.isHidden = true
+        countdownLabel.isHidden = true
+        countdownLabel.fontSize = 84
+        countdownLabel.alpha = 1.0
+        countdownLabel.setScale(1.0)
+    }
+
+    func updateBossHealth(_ percent: Int) {
+        let clamped = max(0, min(100, percent))
+        bossHealthLabel.text = "Boss · \(clamped)%"
+        let fillWidth = bossHealthBarSize.width * CGFloat(clamped) / 100
+        bossHealthFill.path = CGPath(
+            roundedRect: CGRect(
+                x: -fillWidth / 2,
+                y: -bossHealthBarSize.height / 2,
+                width: fillWidth,
+                height: bossHealthBarSize.height
+            ),
+            cornerWidth: 9,
+            cornerHeight: 9,
+            transform: nil
+        )
+    }
+
+    func hideBossFight() {
+        hideBossFightHold()
+        bossHealthBackdrop.isHidden = true
+        bossHealthFill.isHidden = true
+        bossHealthLabel.isHidden = true
     }
 
     func showReady(level: LevelConfig) {
         hideGameOver()
         hideLevelComplete()
+        hideBossFight()
         scoreCaptionLabel.text = "LEVEL \(level.id) · ORDERS"
         updateScore(0, goal: level.ordersRequired)
         messageLabel.text = level.name
@@ -326,6 +425,7 @@ final class GameHUD {
     func showPlaying(level: LevelConfig) {
         hideGameOver()
         hideLevelComplete()
+        hideBossFight()
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
@@ -336,6 +436,7 @@ final class GameHUD {
     func showPlaying(score: Int, goal: Int) {
         hideGameOver()
         hideLevelComplete()
+        hideBossFight()
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)
@@ -345,6 +446,7 @@ final class GameHUD {
 
     func showGameOver(score: Int, goal: Int, best: Int, canContinue: Bool) {
         hideLevelComplete()
+        hideBossFight()
         canWatchAdToContinue = canContinue
 
         messageLabel.text = ""
@@ -428,6 +530,7 @@ final class GameHUD {
 
     func showLevelComplete(level: LevelConfig) {
         hideGameOver()
+        hideBossFight()
         messageLabel.text = ""
         subMessageLabel.text = ""
         GameTheme.syncShadow(on: messageLabel)

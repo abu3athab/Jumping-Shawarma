@@ -8,6 +8,7 @@ struct JumpyShawarmaApp: App {
     init() {
         migrateLegacyUserDefaults()
         UIWindow.appearance().backgroundColor = UIColor(red: 0.42, green: 0.2, blue: 0.16, alpha: 1)
+        GameAudioManager.shared.prepare()
     }
 
     private func migrateLegacyUserDefaults() {
@@ -26,15 +27,67 @@ struct JumpyShawarmaApp: App {
 
     var body: some Scene {
         WindowGroup {
+            AppRootView()
+                .environmentObject(rewardedAdManager)
+        }
+    }
+}
+
+private struct AppRootView: View {
+    @EnvironmentObject private var rewardedAdManager: RewardedAdManager
+    @State private var showSplash = true
+
+    var body: some View {
+        ZStack {
             RootView()
                 .background(AppColors.dashboard.ignoresSafeArea())
-                .environmentObject(rewardedAdManager)
+                .opacity(showSplash ? 0 : 1)
+
+            if showSplash {
+                SplashView()
+                    .transition(.opacity)
+            }
+        }
+        .task {
+            rewardedAdManager.prepare()
+            GameAssetLoader.preloadIfNeeded()
+            try? await Task.sleep(for: .seconds(GameConstants.splashDuration))
+            withAnimation(.easeOut(duration: 0.25)) {
+                showSplash = false
+            }
+        }
+    }
+}
+
+private struct SplashView: View {
+    var body: some View {
+        ZStack {
+            AppColors.dashboard
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Image("ShawarmaWrap")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 220, height: 160)
+
+                Text("Jumpy Shawarma")
+                    .font(.system(size: 30, weight: .bold))
+                    .foregroundStyle(AppColors.splashTitle)
+
+                Text("Serve the night shift")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(AppColors.splashSubtitle)
+            }
+            .offset(y: -36)
         }
     }
 }
 
 private enum AppColors {
     static let dashboard = Color(red: 0.42, green: 0.2, blue: 0.16)
+    static let splashTitle = Color(red: 0.98, green: 0.93, blue: 0.82)
+    static let splashSubtitle = Color(red: 1.0, green: 0.84, blue: 0.35).opacity(0.9)
 }
 
 struct RootView: View {
@@ -74,6 +127,9 @@ struct RootView: View {
                 .id(level)
             }
         }
+        .task {
+            GameAssetLoader.preloadIfNeeded()
+        }
     }
 }
 
@@ -93,93 +149,104 @@ struct GameContainerView: View {
     let onNextLevel: (LevelConfig) -> Void
 
     @EnvironmentObject private var rewardedAdManager: RewardedAdManager
-    @State private var scene: GameScene
+    @State private var scene: GameScene?
     @State private var showsLevelsButton = true
     @State private var safeAreaTop: CGFloat = 0
     @State private var freezesSceneLayout = false
+
+    private let fallbackSceneHeight: CGFloat = 852
 
     init(level: LevelConfig, onExit: @escaping () -> Void, onNextLevel: @escaping (LevelConfig) -> Void) {
         self.level = level
         self.onExit = onExit
         self.onNextLevel = onNextLevel
-        _scene = State(initialValue: GameScene(size: CGSize(width: 393, height: 852), level: level))
     }
 
     var body: some View {
-        ZStack {
-            level.theme.swiftUIBackground
-                .ignoresSafeArea()
+        GeometryReader { proxy in
+            let safeTop = proxy.safeAreaInsets.top
 
-            GameSpriteView(scene: scene, backgroundColor: level.theme.background)
-                .ignoresSafeArea()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .topLeading) {
-            if showsLevelsButton {
-                Button(action: onExit) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chevron.left")
-                        Text("Levels")
-                    }
-                    .font(.custom("AvenirNext-DemiBold", size: 15))
-                    .foregroundStyle(level.theme.swiftUIAccent)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(level.theme.swiftUIAccent.opacity(0.18), in: Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(level.theme.swiftUIAccent.opacity(0.55), lineWidth: 1.5)
-                    )
+            ZStack {
+                level.theme.swiftUIBackground
+                    .ignoresSafeArea()
+
+                if let scene {
+                    GameSpriteView(scene: scene, backgroundColor: level.theme.background)
+                        .ignoresSafeArea()
                 }
-                .padding(.leading, 16)
-                .padding(
-                    .top,
-                    GameHUDLayout.scoreBadgeTopFromScreenTop(
-                        sceneHeight: scene.size.height,
-                        safeAreaTop: safeAreaTop
-                    )
-                )
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: .topLeading) {
+                if showsLevelsButton {
+                    Button(action: {
+                        GameAudioManager.shared.playButtonTap()
+                        onExit()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "chevron.left")
+                            Text("Levels")
+                        }
+                        .font(.custom("AvenirNext-DemiBold", size: 15))
+                        .foregroundStyle(level.theme.swiftUIAccent)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(level.theme.swiftUIAccent.opacity(0.18), in: Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(level.theme.swiftUIAccent.opacity(0.55), lineWidth: 1.5)
+                        )
+                    }
+                    .padding(.leading, 16)
+                    .padding(.top, GameHUDLayout.hudTopPadding(safeAreaTop: safeTop))
+                }
+            }
+            .onAppear {
+                syncLayout(size: proxy.size, safeAreaTop: safeTop)
+            }
+            .onChange(of: proxy.size) { _, newSize in
+                syncLayout(size: newSize, safeAreaTop: proxy.safeAreaInsets.top)
+            }
+            .onChange(of: proxy.safeAreaInsets.top) { _, newTop in
+                syncLayout(size: proxy.size, safeAreaTop: newTop)
+            }
+            .onChange(of: scene != nil) { _, _ in
+                syncLayout(size: proxy.size, safeAreaTop: proxy.safeAreaInsets.top)
             }
         }
-        .background {
-            GeometryReader { proxy in
-                Color.clear
-                    .onAppear {
-                        updateSceneLayout(size: proxy.size, safeAreaTop: proxy.safeAreaInsets.top)
-                    }
-                    .onChange(of: proxy.size) { _, newSize in
-                        updateSceneLayout(size: newSize, safeAreaTop: proxy.safeAreaInsets.top)
-                    }
-                    .onChange(of: proxy.safeAreaInsets.top) { _, newTop in
-                        updateSceneLayout(size: proxy.size, safeAreaTop: newTop)
-                    }
-            }
-        }
-        .onAppear {
-            scene.onNextLevel = onNextLevel
-            scene.onWatchAdToContinue = { completion in
-                rewardedAdManager.showRewardedAd(completion: completion)
-            }
-            scene.onStateChange = { state in
-                freezesSceneLayout = state == .gameOver || state == .continueCountdown
-                showsLevelsButton = state == .ready
-                    || state == .gameOver
-                    || state == .levelComplete
-            }
-            showsLevelsButton = true
+        .task(id: level.id) {
+            GameAssetLoader.preloadIfNeeded()
+            let newScene = GameScene(size: CGSize(width: 393, height: fallbackSceneHeight), level: level)
+            wireScene(newScene)
+            scene = newScene
         }
         .fullScreenCover(isPresented: $rewardedAdManager.isShowingAd) {
-            SimulatedRewardedAdView { granted in
-                rewardedAdManager.finishRewardedAd(granted: granted)
-            }
+            RewardedAdCover()
+                .environmentObject(rewardedAdManager)
         }
     }
 
-    private func updateSceneLayout(size: CGSize, safeAreaTop: CGFloat) {
-        guard size.width > 0, size.height > 0 else { return }
-        guard !freezesSceneLayout else { return }
+    private func syncLayout(size: CGSize, safeAreaTop: CGFloat) {
         self.safeAreaTop = safeAreaTop
-        scene.size = size
+        guard let scene else { return }
+        guard size.width > 0, size.height > 0 else { return }
+
+        if !freezesSceneLayout {
+            scene.size = size
+        }
         scene.applySafeArea(top: safeAreaTop)
+    }
+
+    private func wireScene(_ scene: GameScene) {
+        scene.onNextLevel = onNextLevel
+        scene.onWatchAdToContinue = { completion in
+            rewardedAdManager.showRewardedAd(completion: completion)
+        }
+        scene.onStateChange = { state in
+            freezesSceneLayout = state == .gameOver || state == .continueCountdown
+            showsLevelsButton = state == .ready
+                || state == .gameOver
+                || state == .levelComplete
+        }
+        showsLevelsButton = true
     }
 }

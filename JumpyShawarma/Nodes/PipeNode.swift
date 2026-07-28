@@ -4,191 +4,207 @@ enum PipeNode {
     static let pipeName = "pipe"
     static let scoreZoneName = "scoreZone"
     static let scoredZoneName = "scored"
+    static let capHitboxName = "pipeCapHitbox"
+    static let bodyHitboxName = "pipeBodyHitbox"
 
-    static func makePipe(size: CGSize, isTop: Bool, theme: ThemePalette) -> SKSpriteNode {
-        switch theme.id {
-        case .nightAlley:
-            return makeGrillPipe(size: size, isTop: isTop, theme: theme)
-        case .downtownRush:
-            return makeDeliveryPipe(size: size, isTop: isTop, theme: theme)
-        case .rooftopShift:
-            return makeRooftopPipe(size: size, isTop: isTop, theme: theme)
+    private struct SpritePipeTheme {
+        let capTop: SKTexture
+        let capBottom: SKTexture
+        let body: SKTexture
+        let capDisplayScale: CGFloat
+        let bottomCapWidthRatio: CGFloat
+        let maxCapHeight: CGFloat
+    }
+
+    private static let shawarmaTheme = SpritePipeTheme(
+        capTop: SKTexture(imageNamed: "ShawarmaPipeTop"),
+        capBottom: SKTexture(imageNamed: "ShawarmaPipeBottom"),
+        body: SKTexture(imageNamed: "ShawarmaPipeBody"),
+        capDisplayScale: 0.48,
+        bottomCapWidthRatio: 1.12,
+        maxCapHeight: 68
+    )
+
+    private static let minBodyHeight: CGFloat = 44
+
+    static func preloadTextures() {
+        shawarmaTheme.capTop.preload {}
+        shawarmaTheme.capBottom.preload {}
+        shawarmaTheme.body.preload {}
+        [shawarmaTheme.capTop, shawarmaTheme.capBottom, shawarmaTheme.body].forEach {
+            $0.filteringMode = .linear
         }
     }
 
-    private static func makeGrillPipe(size: CGSize, isTop: Bool, theme: ThemePalette) -> SKSpriteNode {
+    static func makePipe(size: CGSize, isTop: Bool) -> SKSpriteNode {
+        makeSpritePipe(size: size, isTop: isTop, assets: shawarmaTheme)
+    }
+
+    private static func makeSpritePipe(size: CGSize, isTop: Bool, assets: SpritePipeTheme) -> SKSpriteNode {
         let pipe = SKSpriteNode(color: .clear, size: size)
         pipe.name = pipeName
         pipe.zPosition = 3
-        attachPhysics(to: pipe, size: size)
 
-        let frame = SKShapeNode(rectOf: CGSize(width: size.width - 6, height: size.height - 4), cornerRadius: 8)
-        frame.fillColor = theme.metalDark
-        frame.strokeColor = theme.metalLight.withAlphaComponent(0.45)
-        frame.lineWidth = 2
-        pipe.addChild(frame)
+        let capTexture = isTop ? assets.capTop : assets.capBottom
+        let pipeWidth = size.width
+        let naturalCapHeight = naturalCapHeight(
+            for: capTexture,
+            width: pipeWidth,
+            isTop: isTop,
+            assets: assets
+        )
+        let capHeight = resolvedCapHeight(naturalHeight: naturalCapHeight, pipeHeight: size.height, assets: assets)
+        let capWidth = (isTop ? pipeWidth : pipeWidth * assets.bottomCapWidthRatio)
+            * (capHeight / naturalCapHeight)
+        let bodyHeight = max(0, size.height - capHeight)
 
-        addGrillBars(to: pipe, size: size, theme: theme)
-        addHeatBands(to: pipe, size: size, theme: theme)
+        let crop = SKCropNode()
+        crop.zPosition = 1
+        crop.maskNode = SKSpriteNode(color: .white, size: size)
+        pipe.addChild(crop)
 
-        let capY = isTop ? -size.height / 2 + 16 : size.height / 2 - 16
-        let cap = SKShapeNode(rectOf: CGSize(width: size.width + 10, height: 24), cornerRadius: 6)
-        cap.fillColor = theme.metalMid
-        cap.strokeColor = theme.accentSecondary.withAlphaComponent(0.8)
-        cap.lineWidth = 2
-        cap.position = CGPoint(x: 0, y: capY)
+        let cap = SKSpriteNode(texture: capTexture, size: CGSize(width: capWidth, height: capHeight))
         cap.zPosition = 2
-        pipe.addChild(cap)
-
-        let flame = SKShapeNode(circleOfRadius: 7)
-        flame.fillColor = theme.accentSecondary
-        flame.strokeColor = theme.accent.withAlphaComponent(0.6)
-        flame.lineWidth = 1
-        flame.position = CGPoint(x: 0, y: capY + (isTop ? -18 : 18))
-        flame.zPosition = 3
-        GameTheme.pulse(node: flame, minAlpha: 0.65, maxAlpha: 1.0, duration: 0.35)
-        pipe.addChild(flame)
-
-        return pipe
-    }
-
-    private static func makeDeliveryPipe(size: CGSize, isTop: Bool, theme: ThemePalette) -> SKSpriteNode {
-        let pipe = SKSpriteNode(color: .clear, size: size)
-        pipe.name = pipeName
-        pipe.zPosition = 3
-        attachPhysics(to: pipe, size: size)
-
-        let stackCount = max(2, Int(size.height / 52))
-        let boxHeight = size.height / CGFloat(stackCount)
-
-        for index in 0..<stackCount {
-            let y = -size.height / 2 + boxHeight / 2 + CGFloat(index) * boxHeight
-            let box = SKShapeNode(rectOf: CGSize(width: size.width - 8, height: boxHeight - 4), cornerRadius: 4)
-            box.fillColor = index.isMultiple(of: 2)
-                ? GameTheme.color(0.45, 0.32, 0.22)
-                : GameTheme.color(0.52, 0.38, 0.26)
-            box.strokeColor = theme.metalLight.withAlphaComponent(0.35)
-            box.lineWidth = 1.5
-            box.position = CGPoint(x: 0, y: y)
-            box.zPosition = 1
-            pipe.addChild(box)
-
-            let stripe = SKShapeNode(rectOf: CGSize(width: size.width - 16, height: 3), cornerRadius: 1)
-            stripe.fillColor = index.isMultiple(of: 2) ? theme.accent : theme.accentSecondary
-            stripe.strokeColor = .clear
-            stripe.position = CGPoint(x: 0, y: y + boxHeight * 0.18)
-            stripe.zPosition = 2
-            if index == stackCount - 1 {
-                GameTheme.pulse(node: stripe, minAlpha: 0.5, maxAlpha: 1.0, duration: 0.8)
-            }
-            pipe.addChild(stripe)
-        }
-
-        let capY = isTop ? -size.height / 2 + 12 : size.height / 2 - 12
-        let cap = SKShapeNode(rectOf: CGSize(width: size.width + 8, height: 18), cornerRadius: 4)
-        cap.fillColor = theme.metalMid
-        cap.strokeColor = theme.accent
-        cap.lineWidth = 2
-        cap.position = CGPoint(x: 0, y: capY)
-        cap.zPosition = 3
-        pipe.addChild(cap)
-
-        return pipe
-    }
-
-    private static func makeRooftopPipe(size: CGSize, isTop: Bool, theme: ThemePalette) -> SKSpriteNode {
-        let pipe = SKSpriteNode(color: .clear, size: size)
-        pipe.name = pipeName
-        pipe.zPosition = 3
-        attachPhysics(to: pipe, size: size)
-
-        let panelCount = max(2, Int(size.height / 48))
-        let panelHeight = size.height / CGFloat(panelCount)
-
-        for index in 0..<panelCount {
-            let y = -size.height / 2 + panelHeight / 2 + CGFloat(index) * panelHeight
-            let panel = SKShapeNode(rectOf: CGSize(width: size.width - 6, height: panelHeight - 5), cornerRadius: 5)
-            panel.fillColor = index.isMultiple(of: 2) ? theme.metalMid : theme.metalDark
-            panel.strokeColor = theme.metalLight.withAlphaComponent(0.4)
-            panel.lineWidth = 1.5
-            panel.position = CGPoint(x: 0, y: y)
-            panel.zPosition = 1
-            pipe.addChild(panel)
-
-            let ventSlot = SKShapeNode(rectOf: CGSize(width: size.width - 16, height: 4), cornerRadius: 2)
-            ventSlot.fillColor = theme.accentGlow
-            ventSlot.strokeColor = .clear
-            ventSlot.position = CGPoint(x: 0, y: y + panelHeight * 0.12)
-            ventSlot.zPosition = 2
-            if index == panelCount / 2 {
-                GameTheme.pulse(node: ventSlot, minAlpha: 0.35, maxAlpha: 0.85, duration: 0.7)
-            }
-            pipe.addChild(ventSlot)
-        }
-
-        let capY = isTop ? -size.height / 2 + 14 : size.height / 2 - 14
-        let cap = SKShapeNode(rectOf: CGSize(width: size.width + 6, height: 16), cornerRadius: 4)
-        cap.fillColor = theme.metalLight.withAlphaComponent(0.85)
-        cap.strokeColor = theme.accent.withAlphaComponent(0.7)
-        cap.lineWidth = 2
-        cap.position = CGPoint(x: 0, y: capY)
-        cap.zPosition = 3
-        pipe.addChild(cap)
 
         if isTop {
-            let chain = SKShapeNode(rectOf: CGSize(width: 3, height: 18))
-            chain.fillColor = theme.metalLight
-            chain.strokeColor = .clear
-            chain.position = CGPoint(x: 0, y: capY - 20)
-            chain.zPosition = 4
-            pipe.addChild(chain)
+            cap.position = CGPoint(x: 0, y: -size.height / 2 + capHeight / 2)
+            crop.addChild(cap)
+
+            if bodyHeight > 0 {
+                let bodyCenterY = -size.height / 2 + capHeight + bodyHeight / 2
+                addTiledBody(to: crop, texture: assets.body, width: pipeWidth, height: bodyHeight, centerY: bodyCenterY)
+            }
         } else {
-            let steam = SKShapeNode(circleOfRadius: 6)
-            steam.fillColor = GameTheme.steam
-            steam.strokeColor = .clear
-            steam.position = CGPoint(x: 0, y: capY + 16)
-            steam.zPosition = 4
-            GameTheme.pulse(node: steam, minAlpha: 0.15, maxAlpha: 0.45, duration: 1.0)
-            pipe.addChild(steam)
+            cap.position = CGPoint(x: 0, y: size.height / 2 - capHeight / 2)
+            crop.addChild(cap)
+
+            if bodyHeight > 0 {
+                let bodyCenterY = size.height / 2 - capHeight - bodyHeight / 2
+                addTiledBody(to: crop, texture: assets.body, width: pipeWidth, height: bodyHeight, centerY: bodyCenterY)
+            }
         }
+
+        attachPhysics(
+            to: pipe,
+            pipeSize: size,
+            capWidth: capWidth,
+            capHeight: capHeight,
+            bodyHeight: bodyHeight,
+            columnWidth: pipeWidth,
+            isTop: isTop
+        )
 
         return pipe
     }
 
-    private static func attachPhysics(to pipe: SKSpriteNode, size: CGSize) {
-        pipe.physicsBody = SKPhysicsBody(rectangleOf: size)
-        pipe.physicsBody?.isDynamic = false
-        pipe.physicsBody?.categoryBitMask = PhysicsCategory.pipe
-        pipe.physicsBody?.contactTestBitMask = PhysicsCategory.bird
+    private static func naturalCapHeight(
+        for texture: SKTexture,
+        width: CGFloat,
+        isTop: Bool,
+        assets: SpritePipeTheme
+    ) -> CGFloat {
+        let capWidth = isTop ? width : width * assets.bottomCapWidthRatio
+        return capWidth * (texture.size().height / texture.size().width) * assets.capDisplayScale
     }
 
-    private static func addGrillBars(to pipe: SKSpriteNode, size: CGSize, theme: ThemePalette) {
-        let spacing: CGFloat = 34
-        let barCount = max(1, Int(size.height / spacing))
-        for index in 0..<barCount {
-            let y = -size.height / 2 + 24 + CGFloat(index) * spacing
-            let bar = SKShapeNode(rectOf: CGSize(width: size.width - 14, height: 4), cornerRadius: 2)
-            bar.fillColor = theme.metalLight.withAlphaComponent(0.55)
-            bar.strokeColor = .clear
-            bar.position = CGPoint(x: 0, y: y)
-            bar.zPosition = 1
-            pipe.addChild(bar)
+    private static func resolvedCapHeight(
+        naturalHeight: CGFloat,
+        pipeHeight: CGFloat,
+        assets: SpritePipeTheme
+    ) -> CGFloat {
+        min(naturalHeight, assets.maxCapHeight, max(28, pipeHeight - minBodyHeight))
+    }
+
+    private static func addTiledBody(
+        to pipe: SKNode,
+        texture: SKTexture,
+        width: CGFloat,
+        height: CGFloat,
+        centerY: CGFloat
+    ) {
+        let textureSize = texture.size()
+        let segmentHeight = width * (textureSize.height / textureSize.width)
+        let segmentCount = max(1, Int(ceil(height / segmentHeight)))
+        let bottomEdge = centerY - height / 2
+
+        for index in 0..<segmentCount {
+            let segmentTop = bottomEdge + CGFloat(segmentCount - index) * segmentHeight
+            let segmentBottom = max(bottomEdge, segmentTop - segmentHeight)
+            let segmentActualHeight = segmentTop - segmentBottom
+            guard segmentActualHeight > 0.5 else { continue }
+
+            let segment = SKSpriteNode(
+                texture: texture,
+                size: CGSize(width: width, height: segmentActualHeight)
+            )
+            segment.position = CGPoint(x: 0, y: segmentBottom + segmentActualHeight / 2)
+            segment.zPosition = 1
+            pipe.addChild(segment)
         }
     }
 
-    private static func addHeatBands(to pipe: SKSpriteNode, size: CGSize, theme: ThemePalette) {
-        let spacing: CGFloat = 56
-        let bandCount = max(1, Int(size.height / spacing))
-        for index in 0..<bandCount {
-            let y = -size.height / 2 + 40 + CGFloat(index) * spacing
-            let band = SKShapeNode(rectOf: CGSize(width: size.width - 10, height: 8), cornerRadius: 4)
-            band.fillColor = theme.accentGlow
-            band.strokeColor = .clear
-            band.position = CGPoint(x: 0, y: y)
-            band.zPosition = 1
-            GameTheme.pulse(node: band, minAlpha: 0.25, maxAlpha: 0.7, duration: 0.8 + Double(index) * 0.05)
-            pipe.addChild(band)
+    private static func attachPhysics(
+        to pipe: SKSpriteNode,
+        pipeSize: CGSize,
+        capWidth: CGFloat,
+        capHeight: CGFloat,
+        bodyHeight: CGFloat,
+        columnWidth: CGFloat,
+        isTop: Bool
+    ) {
+        let capCenterY = isTop
+            ? -pipeSize.height / 2 + capHeight / 2
+            : pipeSize.height / 2 - capHeight / 2
+
+        let capBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: capWidth, height: capHeight),
+            center: CGPoint(x: 0, y: capCenterY)
+        )
+
+        var bodies = [capBody]
+
+        let capHitbox = SKSpriteNode(color: .clear, size: CGSize(width: capWidth, height: capHeight))
+        capHitbox.name = capHitboxName
+        capHitbox.position = CGPoint(x: 0, y: capCenterY)
+        pipe.addChild(capHitbox)
+
+        if bodyHeight > 0.5 {
+            let bodyCenterY = isTop
+                ? -pipeSize.height / 2 + capHeight + bodyHeight / 2
+                : pipeSize.height / 2 - capHeight - bodyHeight / 2
+
+            let columnBody = SKPhysicsBody(
+                rectangleOf: CGSize(width: columnWidth, height: bodyHeight),
+                center: CGPoint(x: 0, y: bodyCenterY)
+            )
+            bodies.append(columnBody)
+
+            let bodyHitbox = SKSpriteNode(color: .clear, size: CGSize(width: columnWidth, height: bodyHeight))
+            bodyHitbox.name = bodyHitboxName
+            bodyHitbox.position = CGPoint(x: 0, y: bodyCenterY)
+            pipe.addChild(bodyHitbox)
         }
+
+        let combined = SKPhysicsBody(bodies: bodies)
+        combined.isDynamic = false
+        combined.restitution = 0
+        combined.categoryBitMask = PhysicsCategory.pipe
+        combined.contactTestBitMask = PhysicsCategory.bird
+        combined.collisionBitMask = PhysicsCategory.none
+        pipe.physicsBody = combined
+    }
+
+    static func intersectsBird(_ birdFrame: CGRect, in scene: SKScene) -> Bool {
+        var hit = false
+        for hitboxName in [capHitboxName, bodyHitboxName] {
+            scene.enumerateChildNodes(withName: hitboxName) { node, stop in
+                guard birdFrame.intersects(node.calculateAccumulatedFrame()) else { return }
+                hit = true
+                stop.pointee = true
+            }
+            if hit { break }
+        }
+        return hit
     }
 
     static func makeScoreZone(at position: CGPoint, gapHeight: CGFloat) -> SKNode {

@@ -1,13 +1,21 @@
 import SpriteKit
 
 final class PipeSpawner {
+    private enum GapZone: CaseIterable {
+        case low
+        case mid
+        case high
+    }
+
     private var lastSpawnTime: TimeInterval = 0
+    private var lastGapZone: GapZone?
     private var canSpawn = true
     var theme: ThemePalette = .nightAlley
     var level: LevelConfig = .nightAlley
 
     func resetTimer() {
         lastSpawnTime = 0
+        lastGapZone = nil
         canSpawn = true
     }
 
@@ -19,6 +27,7 @@ final class PipeSpawner {
         enumerateObstacles(in: scene) { node in
             node.removeAllActions()
         }
+        FireHazard.stopAll(in: scene)
     }
 
     var spawnTime: TimeInterval {
@@ -36,7 +45,7 @@ final class PipeSpawner {
     }
 
     func scheduleNextSpawn(after delay: TimeInterval, from currentTime: TimeInterval) {
-        lastSpawnTime = currentTime - GameConstants.pipeSpawnInterval + delay
+        lastSpawnTime = currentTime - GameConstants.pipeSpawnIntervalForDevice + delay
         canSpawn = true
     }
 
@@ -55,7 +64,7 @@ final class PipeSpawner {
         var nodesByPairX: [Int: [SKNode]] = [:]
 
         enumerateObstacles(in: scene) { node in
-            let remainingDistance = node.position.x + GameConstants.pipeWidth * 2
+            let remainingDistance = node.position.x + self.level.pipeWidth * 2
             guard remainingDistance > 0 else {
                 node.removeFromParent()
                 return
@@ -69,7 +78,7 @@ final class PipeSpawner {
             guard let anchor = nodes.first else { continue }
 
             let anchorX = pairAnchorX(for: anchor)
-            let remainingDistance = anchorX + GameConstants.pipeWidth * 2
+            let remainingDistance = anchorX + level.pipeWidth * 2
             let duration = TimeInterval(remainingDistance / scrollSpeed)
             let phaseDelay = level.hasMovingObstacles
                 ? TimeInterval.random(in: 0...(level.obstacleVerticalDuration * 2))
@@ -110,7 +119,7 @@ final class PipeSpawner {
 
         for name in [PipeNode.scoreZoneName, PipeNode.scoredZoneName] {
             scene.enumerateChildNodes(withName: name) { node, _ in
-                guard node.position.x > spawnX + GameConstants.pipeWidth else { return }
+                guard node.position.x > spawnX + self.level.pipeWidth else { return }
                 guard node.position.x < bestX else { return }
                 bestX = node.position.x
                 bestZone = node
@@ -137,7 +146,7 @@ final class PipeSpawner {
     }
 
     private func removeObstaclePair(nearX x: CGFloat, in scene: SKScene) {
-        let tolerance = GameConstants.pipeWidth + 24
+        let tolerance = level.pipeWidth + 24
 
         enumerateObstacles(in: scene) { node in
             guard abs(node.position.x - x) <= tolerance else { return }
@@ -151,9 +160,11 @@ final class PipeSpawner {
     }
 
     func removeAll(from scene: SKScene) {
+        lastGapZone = nil
         enumerateObstacles(in: scene) { node in
             node.removeFromParent()
         }
+        FireHazard.removeAll(from: scene)
     }
 
     func exitRemainingObstacles(in scene: SKScene) {
@@ -167,6 +178,14 @@ final class PipeSpawner {
                 SKAction.removeFromParent(),
             ]))
         }
+        FireHazard.stopAll(in: scene)
+        scene.enumerateChildNodes(withName: FireHazard.fireballName) { node, _ in
+            node.removeAllActions()
+            node.run(.sequence([
+                SKAction.fadeOut(withDuration: GameConstants.obstacleExitDuration * 0.5),
+                SKAction.removeFromParent(),
+            ]))
+        }
     }
 
     func update(currentTime: TimeInterval, scene: SKScene) {
@@ -174,36 +193,41 @@ final class PipeSpawner {
         if lastSpawnTime == 0 {
             lastSpawnTime = currentTime
         }
-        guard currentTime - lastSpawnTime >= GameConstants.pipeSpawnInterval else { return }
+        guard currentTime - lastSpawnTime >= GameConstants.pipeSpawnIntervalForDevice else { return }
         spawnPair(in: scene)
         lastSpawnTime = currentTime
     }
 
     private func spawnPair(in scene: SKScene) {
         let size = scene.size
-        let pipeWidth = GameConstants.pipeWidth
-        let gapHeight = GameConstants.gapHeight
-        let amplitude = level.hasMovingObstacles ? level.obstacleVerticalAmplitude : 0
-        let edgeMargin: CGFloat = 120 + amplitude * 0.35
-        let maxY = size.height - edgeMargin - gapHeight / 2 - amplitude
-        let minY = max(
-            GameConstants.groundHeight + gapHeight / 2 + amplitude + 28,
-            edgeMargin + gapHeight / 2 + amplitude * 0.5
-        )
-        let centerY = minY <= maxY
-            ? CGFloat.random(in: minY...maxY)
-            : (minY + maxY) / 2
+        let pipeWidth = level.pipeWidth
+        let gapHeight = level.gapHeight
+        let bounds = gapCenterBounds(in: size)
+        let centerY = pickGapCenterY(minY: bounds.minY, maxY: bounds.maxY)
 
         let topHeight = size.height - (centerY + gapHeight / 2)
         let bottomHeight = centerY - gapHeight / 2
 
-        let topPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: topHeight), isTop: true, theme: theme)
+        let topPipe = PipeNode.makePipe(
+            size: CGSize(width: pipeWidth, height: topHeight),
+            isTop: true
+        )
         topPipe.position = CGPoint(x: size.width + pipeWidth, y: size.height - topHeight / 2)
         scene.addChild(topPipe)
 
-        let bottomPipe = PipeNode.makePipe(size: CGSize(width: pipeWidth, height: bottomHeight), isTop: false, theme: theme)
+        let bottomPipe = PipeNode.makePipe(
+            size: CGSize(width: pipeWidth, height: bottomHeight),
+            isTop: false
+        )
         bottomPipe.position = CGPoint(x: size.width + pipeWidth, y: bottomHeight / 2)
         scene.addChild(bottomPipe)
+
+        FireHazard.attachShootersIfNeeded(
+            to: topPipe,
+            bottomPipe: bottomPipe,
+            theme: theme,
+            enabled: level.hasFireShooters
+        )
 
         let scoreZone = PipeNode.makeScoreZone(
             at: CGPoint(x: size.width + pipeWidth + 10, y: centerY),
@@ -225,6 +249,44 @@ final class PipeSpawner {
         topPipe.run(movement.copy() as! SKAction)
         bottomPipe.run(movement.copy() as! SKAction)
         scoreZone.run(movement.copy() as! SKAction)
+    }
+
+    private func gapCenterBounds(in size: CGSize) -> (minY: CGFloat, maxY: CGFloat) {
+        let gapHalf = level.gapHeight / 2
+        let amplitude = level.hasMovingObstacles ? level.obstacleVerticalAmplitude : 0
+        let edgeMargin: CGFloat = 120 + amplitude * 0.35
+        let maxY = size.height - edgeMargin - gapHalf - amplitude
+        let minY = max(
+            GameConstants.groundHeight + gapHalf + amplitude + 28,
+            edgeMargin + gapHalf + amplitude * 0.5
+        )
+        return (minY, max(minY, maxY))
+    }
+
+    private func pickGapCenterY(minY: CGFloat, maxY: CGFloat) -> CGFloat {
+        let span = maxY - minY
+        guard span > 1 else { return (minY + maxY) / 2 }
+
+        let zoneSpan = span / 3
+        var zones = GapZone.allCases
+        if let lastGapZone, zones.count > 1 {
+            zones.removeAll { $0 == lastGapZone }
+        }
+
+        let zone = zones.randomElement() ?? .mid
+        lastGapZone = zone
+
+        let zoneRange: ClosedRange<CGFloat>
+        switch zone {
+        case .low:
+            zoneRange = minY...(minY + zoneSpan)
+        case .mid:
+            zoneRange = (minY + zoneSpan)...(minY + zoneSpan * 2)
+        case .high:
+            zoneRange = (minY + zoneSpan * 2)...maxY
+        }
+
+        return CGFloat.random(in: zoneRange)
     }
 
     private func pairMovementActions(

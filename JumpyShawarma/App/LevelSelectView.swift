@@ -110,6 +110,7 @@ private struct LevelRow: View {
         .contentShape(RoundedRectangle(cornerRadius: 18))
         .onTapGesture {
             guard isUnlocked else { return }
+            GameAudioManager.shared.playButtonTap()
             onSelect()
         }
         .opacity(isUnlocked ? 1 : 0.55)
@@ -120,7 +121,7 @@ private struct LevelRow: View {
             return "Completed · \(level.ordersRequired) orders"
         }
         if isUnlocked {
-            return level.featureSummary
+            return level.levelDesciption
         }
         if let previous = level.previous {
             return "Complete Level \(previous.id) to unlock"
